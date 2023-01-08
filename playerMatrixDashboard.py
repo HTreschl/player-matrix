@@ -17,9 +17,10 @@ sim_results = pd.DataFrame()
 #get data from upload
 dat = st.sidebar.file_uploader('Upload CSV Player Data Here')
 
-while dat is not None:
-
+if dat is not None:
     df = pd.read_excel(dat)
+    st.session_state.key = 'input data'
+    st.session_state['input data'] = df
     with st.expander('Uploaded Data'):
         st.dataframe(df)
     
@@ -27,7 +28,8 @@ while dat is not None:
 count = st.sidebar.number_input('How many sims to run?')    
 sims_button = st.sidebar.button('Run Sims')
 if sims_button:
-    sim_results = sims.standard_sims(df, 'nfl', count, fpts_col_name='avg fpts', ceil_column = 'avg ceil', floor_column = 'avg floor', include_correlations=True)        
+    st.session_state.key = 'sim results'
+    st.session_state['sim results'] = sims.standard_sims(df, 'nfl', count, fpts_col_name='avg fpts', ceil_column = 'avg ceil', floor_column = 'avg floor', include_correlations=True)        
         
         
 with st.expander('Sims Results'):
