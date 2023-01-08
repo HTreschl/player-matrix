@@ -17,3 +17,6 @@ upload_button = st.sidebar.button('Data Uploaded')
 
 if upload_button:
     df = pd.read_excel(dat)
+    #show data
+    with st.expander('Uploaded Data'):
+        st.dataframe(df)
