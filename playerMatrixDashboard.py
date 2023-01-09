@@ -17,10 +17,14 @@ st.session_state.key = 'input data'
 st.session_state.key = 'lineups'
 st.session_state.key = 'player matches'
 st.session_state.key = 'relationships data'
-st.session_state['sim results'] = pd.DataFrame()
-st.session_state['input data']  = pd.DataFrame()
-st.session_state['relationships data'] = pd.DataFrame()
-st.session_state['lineups'] = []
+if st.session_state['sim results'] is None:
+    st.session_state['sim results'] = pd.DataFrame()
+if st.session_state['input data'] is None:
+    st.session_state['input data']  = pd.DataFrame()
+if st.session_state['relationships data'] is None:
+    st.session_state['relationships data'] = pd.DataFrame()
+if st.session_state['lineups'] is None:
+    st.session_state['lineups'] = []
 
 #initial tab layout
 data_tab, sims_tab, relationships_tab = st.tabs(['Import Projections','Run Sims', 'Explore Relationships'])
