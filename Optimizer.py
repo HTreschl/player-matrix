@@ -150,7 +150,7 @@ class NFL():
         self.salary = 50000
         self.roster = ['QB','RB','RB','WR','WR','WR','TE','DST']
         self.num_players = 9
-        self.solver = pulp.getSolver('CPLEX_CMD')
+        #self.solver = pulp.getSolver('CPLEX_CMD')
         
     def standard_optimizer(self, df, objective_fn_column = 'avg fpts'):
         '''returns the top lineup from the given dataframe for the standard contest type
