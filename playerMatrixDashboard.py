@@ -17,7 +17,7 @@ st.session_state.key = 'input data'
 st.session_state.key = 'lineups'
 st.session_state.key = 'player matches'
 st.session_state.key = 'relationships data'
-st.session_state['sim results '] = pd.DataFrame()
+st.session_state['sim results'] = pd.DataFrame()
 st.session_state['input data']  = pd.DataFrame()
 st.session_state['relationships data'] = pd.DataFrame()
 
@@ -52,7 +52,7 @@ with relationships_tab:
     st.dataframe(st.session_state['relationships data'])
     player_options = list(st.session_state['sim results'].index)
     selected_players = set(st.multiselect('Players to Include', options = player_options))
-    #filtered_players = controller.lineup_parser(st.session_state['lineups'], selected_players)
+    filtered_players = controller.lineup_parser(st.session_state['lineups'], selected_players)
     st.session_state['relationships_data'] = filtered_players
              
     
