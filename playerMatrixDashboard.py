@@ -20,6 +20,7 @@ st.session_state.key = 'relationships data'
 st.session_state['sim results'] = pd.DataFrame()
 st.session_state['input data']  = pd.DataFrame()
 st.session_state['relationships data'] = pd.DataFrame()
+st.session_state.key['lineups'] = []
 
 #initial tab layout
 data_tab, sims_tab, relationships_tab = st.tabs(['Import Projections','Run Sims', 'Explore Relationships'])
