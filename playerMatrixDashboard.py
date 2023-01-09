@@ -53,6 +53,7 @@ with relationships_tab:
     player_options = list(st.session_state['sim results'].index)
     selected_players = set(st.multiselect('Players to Include', options = player_options))
     st.session_state['relationships_data'] = controller.lineup_parser(st.session_state['lineups'], selected_players)
+    st.dataframe(st.session_state['relationships data'])
     
              
     
