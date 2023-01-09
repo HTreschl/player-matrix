@@ -184,7 +184,7 @@ class NFL():
         #add objective function
         prob.setObjective(pulp.lpSum([df[objective_fn_column][f]*lineup[f] for f in df.index]))
         
-        prob.solve(self.solver)
+        prob.solve()
         slns = [x.name[8:].replace('_',' ') for x in prob.variables() if x.varValue == 1]
         return slns
     
@@ -234,7 +234,7 @@ class NFL():
         #add objective function
         prob.setObjective(pulp.lpSum([df[objective_fn_column][f]*lineup[f] for f in df.index]))
         
-        prob.solve(self.solver)
+        prob.solve()
         slns = [x.name[8:].replace('_',' ') for x in prob.variables() if x.varValue == 1]
         return slns
     
