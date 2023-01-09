@@ -17,10 +17,6 @@ st.session_state.key = 'input data'
 st.session_state.key = 'lineups'
 st.session_state.key = 'player matches'
 st.session_state.key = 'relationships data'
-st.session_state['sim results'] = pd.DataFrame()
-st.session_state['input data']  = pd.DataFrame()
-st.session_state['relationships data'] = pd.DataFrame()
-st.session_state['lineups'] = []
 
 #initial tab layout
 data_tab, sims_tab, relationships_tab = st.tabs(['Import Projections','Run Sims', 'Explore Relationships'])
@@ -44,7 +40,7 @@ with sims_tab:
     st.dataframe(st.session_state['sim results'])
     
 if sims_button:
-    sims_results,lineups = sims.standard_sims(df, 'nfl', count, fpts_col_name='avg fpts', ceil_column = 'avg ceil', floor_column = 'avg floor', include_correlations=True) 
+    sims_results,lineups = sims.standard_sims(df, 'nfl', count, fpts_col_name='avg fpts', ceil_column = 'avg ceil', floor_column = 'avg floor', include_correlations=True)
     st.session_state['sim results'] = sims_results
     st.session_state['lineups'] = lineups
     
