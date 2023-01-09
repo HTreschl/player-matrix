@@ -11,15 +11,18 @@ import runSims as sims
 #instantiate
 st.title('Optimal PLayer Degrees of Seperation')
 #initial data
-df = pd.DataFrame()
-sim_results = pd.DataFrame()
+st.session_state.key = 'sim results'
+st.session_state.key = 'input data'
+st.session_state.key = 'lineups'
+st.session_state['sim results '] = pd.DataFrame()
+st.session_state['input data']  = pd.DataFrame()
+
 
 #get data from upload
 dat = st.sidebar.file_uploader('Upload CSV Player Data Here')
 
 if dat is not None:
     df = pd.read_excel(dat)
-    st.session_state.key = 'input data'
     st.session_state['input data'] = df
     with st.expander('Uploaded Data'):
         st.dataframe(st.session_state['input data'])
@@ -28,8 +31,10 @@ if dat is not None:
 count = int(st.sidebar.number_input('How many sims to run?'))    
 sims_button = st.sidebar.button('Run Sims')
 if sims_button:
-    st.session_state.key = 'sim results'
-    st.session_state['sim results'] = sims.standard_sims(df, 'nfl', count, fpts_col_name='avg fpts', ceil_column = 'avg ceil', floor_column = 'avg floor', include_correlations=True)        
+    sims_results,lineups = sims.standard_sims(df, 'nfl', count, fpts_col_name='avg fpts', ceil_column = 'avg ceil', floor_column = 'avg floor', include_correlations=True) 
+    st.session_state['sim results'] = sims_results
+    st.session_state['lineups'] = lineups
+    
                 
 with st.expander('Sims Results'):
     st.dataframe(st.session_state['sim results'])
