@@ -36,13 +36,13 @@ if dat is not None:
 with sims_tab:    
     count = int(st.number_input('How many sims to run?'))    
     sims_button = st.button('Run Sims')
-    st.subheader('Sims Results')
-    st.dataframe(st.session_state['sim results'])
     
 if sims_button:
     sims_results,lineups = sims.standard_sims(df, 'nfl', count, fpts_col_name='avg fpts', ceil_column = 'avg ceil', floor_column = 'avg floor', include_correlations=True)
     st.session_state['sim results'] = sims_results
     st.session_state['lineups'] = lineups
+    st.subheader('Sims Results')
+    st.dataframe(st.session_state['sim results'])
     
 #relationships tab
 with relationships_tab:
