@@ -59,5 +59,5 @@ with relationships_tab:
     selected_players = set(st.multiselect('Players to Include', options = player_options))
     filtered_players = controller.lineup_parser(st.session_state['lineups'], selected_players)
     st.session_state['relationships_data'] = filtered_players
-             
+    print(st.session_state['relationships_data'])         
     
