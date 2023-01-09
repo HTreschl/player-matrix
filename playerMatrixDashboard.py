@@ -17,8 +17,7 @@ st.session_state.key = 'input data'
 st.session_state.key = 'lineups'
 st.session_state.key = 'player matches'
 st.session_state.key = 'relationships data'
-if st.session_state['sim results'] is None:
-    st.session_state['sim results'] = pd.DataFrame()
+st.session_state['sim results'] = pd.DataFrame()
 if st.session_state['input data'] is None:
     st.session_state['input data']  = pd.DataFrame()
 if st.session_state['relationships data'] is None:
