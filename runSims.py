@@ -68,7 +68,7 @@ def nfl_correlated_projections():
     return ''
         
 
-def standard_sims(df, sport, count, fpts_col_name='Fpts', ceil_column=None, floor_column=None, include_correlations=False):
+def standard_sims(df, sport, count, fpts_col_name='Fpts', ceil_column=None, floor_column=None,ownership_column = None, include_correlations=False):
     '''
     returns a datarame of optimal rates as well as an array of simulated winning lineups
     
@@ -90,7 +90,7 @@ def standard_sims(df, sport, count, fpts_col_name='Fpts', ceil_column=None, floo
     for i in range(count):
         df['Observed Fpts'] = scramble_projections(df, fpts_col_name, ceil_column, floor_column, include_correlations=include_correlations)
         lineup = optimizer(df, objective_fn_column='Observed Fpts')
-        lineup_list.append(lineup)
+        lineup_list.append(set(lineup))
         
 
     player_list = []
@@ -104,10 +104,13 @@ def standard_sims(df, sport, count, fpts_col_name='Fpts', ceil_column=None, floo
     df = df.merge(counts, how='left', on='Name')
     #calculations
     df['Optimal Ownership'] = (df['Count']/count)*100
-    df['Leverage'] = df['Optimal Ownership'] - df['avg ownership']   
+    include_columns = ['Name','Pos','Team','Opp','Salary','Optimal Ownership', fpts_col_name]
+    if ownership_column is not None:
+        df['Leverage'] = df['Optimal Ownership'] - df[ownership_column] 
+        include_columns += [ownership_column, 'Leverage']
     #filter and sort
-    df = df[['Name','Pos','Team','Opp','Salary','avg ownership','Leverage','Optimal Ownership']+[fpts_col_name]]
-    df = df.sort_values(by = ['Pos','Leverage'], ascending = False).set_index('Name')
+    df = df[include_columns]
+    df = df.sort_values(by = ['Pos','Optimal Ownership'], ascending = False).set_index('Name')
     df = df[df['Optimal Ownership'].isnull()==False]
     return df, lineup_list
 
@@ -168,6 +171,13 @@ def parse_lineup_list(lineups):
         res_dict[player] = counts
     return res_dict
         
+def lineup_parser(lineups, crit):
+    rel_lineups = [x for x in lineups if crit.issubset(x)]
+    flat_lineups = [x for y in rel_lineups for x in y]
+    counts = pd.DataFrame(flat_lineups, columns=['Name']).groupby('Name')['Name'].count()
+    counts = pd.DataFrame(counts).rename(columns = {'Name':'Count'}).reset_index().sort_values(by = 'Count', ascending=False)
+    return counts
+
 
 
 
