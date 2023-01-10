@@ -52,6 +52,7 @@ if dat is not None:
     df = pd.read_csv(dat)
     st.session_state['input data'] = df
     with data_tab:
+        st.subheader('Imported Data')
         st.dataframe(st.session_state['input data'])
     
 #sims tab
@@ -61,7 +62,7 @@ with sims_tab:
     sims_button = st.button('Run Sims')
     
 if sims_button:
-    sims_results,lineups = sims.standard_sims(df, 'nfl', count, fpts_col_name='fpts', ceil_column = 'ceil', floor_column = 'floor', include_correlations=True)
+    sims_results,lineups = sims.standard_sims(df, 'nfl', count, fpts_col_name='Fpts', ceil_column = 'Ceil', floor_column = 'Floor', include_correlations=True)
     st.session_state['sim results'] = sims_results
     st.session_state['lineups'] = lineups
     st.session_state['sim count'] = count
