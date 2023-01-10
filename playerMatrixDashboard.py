@@ -61,6 +61,7 @@ with relationships_tab:
         filtered_players = filtered_players[filtered_players['Name'].isin(selected_players)==False]
         filtered_players['% of Filtered Lineups'] = (filtered_players['Count']/tot_matching_lineups)*100
         filtered_players['% of Total Lineups'] = (filtered_players['Count']/st.session_state['sim count'])*100
+        filtered_players.set_index('Name')
         st.session_state['relationships data'] = filtered_players
-        st.dataframe(st.session_state['relationships data'].set_index['Name'])      
+        st.dataframe(st.session_state['relationships data'])      
     
