@@ -41,8 +41,13 @@ if sims_button:
     sims_results,lineups = sims.standard_sims(df, 'nfl', count, fpts_col_name='avg fpts', ceil_column = 'avg ceil', floor_column = 'avg floor', include_correlations=True)
     st.session_state['sim results'] = sims_results
     st.session_state['lineups'] = lineups
-    st.subheader('Sims Results')
-    st.dataframe(st.session_state['sim results'])
+    with sims_tab:
+        st.subheader('Sims Results')
+        st.dataframe(st.session_state['sim results'])
+else:
+    with sims_tab:
+        st.subheader('Sims Results')
+        st.dataframe(st.session_state['sim results']) 
     
 #relationships tab
 with relationships_tab:
@@ -50,6 +55,9 @@ with relationships_tab:
     selected_players = set(st.multiselect('Players to Include', options = player_options))
     if len(selected_players) > 0:
         filtered_players = controller.lineup_parser(st.session_state['lineups'], selected_players)
+        tot_matching_lineups = filtered_players.loc[filtered_players['Name']==selected_players[0], ['Count']]
+        filtered_players = filtered_players[filtered_players['Name'].isin(selected_players)==False]
+        filtered_players['% of Lineups'] = (filtered_players['Count']/tot_matching_lineups)*100
         st.session_state['relationships data'] = filtered_players
         st.dataframe(st.session_state['relationships data'])      
     
