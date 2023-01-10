@@ -46,9 +46,16 @@ with intro_tab:
 #get data from upload
 with data_tab:
     dat = st.file_uploader('Upload CSV Player Data Here')
-    st.download_button('Download a Template', data = sample_data.to_csv().encode('utf-8'), file_name = 'Sample DFS Data.csv')
+    col1,col2 = st.columns(2)
+    with col1:
+        st.download_button('Download a Template', data = sample_data.to_csv().encode('utf-8'), file_name = 'Sample DFS Data.csv')
+    with col2:
+        sample_button = st.button('Use Sample Data')
 
-if dat is not None:
+if sample_button:
+    st.session_state['input data'] = sample_data
+
+if dat is not None or st.session_state['input data'] is not None:
     df = pd.read_csv(dat)
     st.session_state['input data'] = df
     with data_tab:
