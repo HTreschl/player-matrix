@@ -49,7 +49,7 @@ with data_tab:
     st.download_button('Download a Template', data = sample_data.to_csv().encode('utf-8'), file_name = 'Sample DFS Data.csv')
 
 if dat is not None:
-    df = pd.read_excel(dat)
+    df = pd.read_csv(dat)
     st.session_state['input data'] = df
     with data_tab:
         st.dataframe(st.session_state['input data'])
