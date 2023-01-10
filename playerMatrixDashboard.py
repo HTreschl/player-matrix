@@ -55,9 +55,10 @@ with data_tab:
 if sample_button:
     st.session_state['input data'] = sample_data
 
-if dat is not None or st.session_state['input data'] is not None:
-    df = pd.read_csv(dat)
-    st.session_state['input data'] = df
+if dat is not None or st.session_state['input data'] is not None: #show the data if it's available
+    if dat is not None:
+        df = pd.read_csv(dat)
+        st.session_state['input data'] = df
     with data_tab:
         st.subheader('Imported Data')
         st.dataframe(st.session_state['input data'])
@@ -68,7 +69,7 @@ with sims_tab:
     count = int(st.number_input('How many sims to run?'))    
     sims_button = st.button('Run Sims')
     
-if sims_button:
+if sims_button: #run the sims
     sims_results,lineups = sims.standard_sims(df, 'nfl', count, fpts_col_name='Fpts', ceil_column = 'Ceil', floor_column = 'Floor', include_correlations=True)
     st.session_state['sim results'] = sims_results
     st.session_state['lineups'] = lineups
@@ -76,7 +77,7 @@ if sims_button:
     with sims_tab:
         st.subheader('Sims Results')
         st.dataframe(st.session_state['sim results'])
-else:
+else: #persist the results table
     with sims_tab:
         st.subheader('Sims Results')
         st.dataframe(st.session_state['sim results']) 
