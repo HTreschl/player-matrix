@@ -14,7 +14,7 @@ sample_data = pd.read_csv('Sample App Data.csv') #upload sample data
 #initial data caching
 st.session_state.key = 'sim results'
 if 'sim results' not in st.session_state:
-    st.session_date['sim results'] = pd.DataFrame()
+    st.session_state['sim results'] = pd.DataFrame()
 st.session_state.key = 'input data'
 if 'input data' not in st.session_state:
     st.session_state['input data'] = pd.DataFrame()
