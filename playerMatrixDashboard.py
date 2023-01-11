@@ -13,13 +13,20 @@ import playerMatrixDashboardController as controller
 sample_data = pd.read_csv('Sample App Data.csv') #upload sample data
 #initial data caching
 st.session_state.key = 'sim results'
+if 'sim results' not in st.session_state:
+    st.session_date['sim results'] = pd.DataFrame()
 st.session_state.key = 'input data'
 if 'input data' not in st.session_state:
     st.session_state['input data'] = pd.DataFrame()
 st.session_state.key = 'lineups'
-st.session_state.key = 'player matches'
+if 'lineups' not in st.session_state:
+    st.session_state['lineups'] = []
 st.session_state.key = 'relationships data'
+if 'relationships data' not in st.session_state:
+    st.session_state['relationships data'] = pd.DataFrame()
 st.session_state.key = 'sim count'
+if 'sim count' not in st.session_state:
+    st.session_state['sim count'] = 1
 
 #set global constants
 has_valid_data = controller.data_checker(st.session_state['input data'])
