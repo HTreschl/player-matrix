@@ -72,7 +72,7 @@ if sample_button:
 
 if dat is not None:
     df = pd.read_csv(dat)
-    st.session.state.key = 'input data'
+    st.session_state.key = 'input data'
     st.session_state['input data'] = df   
     has_valid_data = controller.data_checker(st.session_state['input_data'])
 
