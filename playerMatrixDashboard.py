@@ -14,16 +14,15 @@ sample_data = pd.read_csv('Sample App Data.csv') #upload sample data
 #initial data caching
 st.session_state.key = 'sim results'
 st.session_state.key = 'input data'
+if 'input data' not in st.session_state:
+    st.session_state['input data'] = pd.DataFrame()
 st.session_state.key = 'lineups'
 st.session_state.key = 'player matches'
 st.session_state.key = 'relationships data'
 st.session_state.key = 'sim count'
 
 #set global constants
-if st.session_state['input data']:
-    has_valid_data = controller.data_checker(st.session_state['input data'])
-else:
-    has_valid_data=False
+has_valid_data = controller.data_checker(st.session_state['input data'])
 
 #initial tab layout and title
 st.title('DFS Degrees of Separation')
