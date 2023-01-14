@@ -80,7 +80,6 @@ def standard_sims(df, sport, count,correlation_values = {'QB':{'WR':.66, 'TE':.3
     '''
     
     df = df.drop_duplicates(subset = ['Name','Team',fpts_col_name])
-    
     if sport == 'mlb':
         model = opt.MLB(df)
         df = model.prep_df()
@@ -92,7 +91,7 @@ def standard_sims(df, sport, count,correlation_values = {'QB':{'WR':.66, 'TE':.3
     lineup_list = []
     
     for i in range(count):
-        df['Observed Fpts'] = scramble_projections(correlation_values, df, fpts_col_name, ceil_column, floor_column)
+        df['Observed Fpts'] = scramble_projections(df, fpts_col_name,correlation_values, ceil_column, floor_column)
         lineup = optimizer(df, objective_fn_column='Observed Fpts')
         lineup_list.append(set(lineup))
         
@@ -183,9 +182,12 @@ def lineup_parser(lineups, crit):
     return counts
 
 
-
-
-
-
-
-
+#%%
+df = pd.read_excel('NFL DK Projections.xlsx')
+#df = df[(df['Team'] == 'DEN') | (df['Team'] == 'IND')]
+s,lineups = standard_sims(df,'nfl', 10,fpts_col_name='avg fpts', ceil_column = 'avg ceil', floor_column = 'avg floor', include_correlations=True)
+team_opt = get_team_optimal(s)
+writer = pd.ExcelWriter('sims.xlsx', engine='xlsxwriter')
+s.to_excel(writer, sheet_name='Sims')
+team_opt.to_excel(writer, sheet_name = 'By Team')
+matches = parse_lineup_list(lineups)
