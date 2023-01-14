@@ -27,13 +27,16 @@ if 'relationships data' not in st.session_state:
 st.session_state.key = 'sim count'
 if 'sim count' not in st.session_state:
     st.session_state['sim count'] = 1
+st.session_state.key = 'correlation dict'
+if 'correlation dict' not in st.session_state:
+    st.session_state['correlation dict'] = {'QB':{'WR':.66,'TE':.33,'RB':.08, 'Opp_QB':.24}}
 
 #set global constants
 has_valid_data = controller.data_checker(st.session_state['input data'])
 
 #initial tab layout and title
 st.title('DFS Degrees of Separation')
-intro_tab, data_tab, sims_tab, relationships_tab = st.tabs(['What is this?','Import Projections','Run Sims', 'Explore Relationships'])
+intro_tab, data_tab, sims_tab, relationships_tab, correlations_tab = st.tabs(['What is this?','Import Projections','Run Sims', 'Explore Relationships', 'Edit Correlations'])
 
 
 #write documentation
@@ -95,10 +98,12 @@ if has_valid_data:
         with sims_tab:
             st.subheader('Sims Results')
             st.dataframe(st.session_state['sim results'])
+            st.download_button('Download Sims Results', data = st.session_state['sim results'].to_csv().encode('utf-8'), file_name = 'Sim Results.csv')
     else: #persist the results table
         with sims_tab:
             st.subheader('Sims Results')
-            st.dataframe(st.session_state['sim results']) 
+            st.dataframe(st.session_state['sim results'])
+            st.download_button('Download Sims Results', data = st.session_state['sim results'].to_csv().encode('utf-8'), file_name = 'Sim Results.csv')
         
     #relationships tab
     with relationships_tab:
@@ -122,6 +127,16 @@ else: #no valid data
         st.subheader('Upload data to run sims')
     with relationships_tab: 
         st.subheader('Upload data and run sims to see player relationships')
-    
+        
+#correlations section
+with correlations_tab:
+    ref_col, qb_col, rb_col, te_col, opp_qb_col, opp_rb_col, opp_wr_col, opp_te_col = st.columns(8)
+    with ref_col:
+        st.write('QB')
+    with qb_col:
+        st.write(1)
+    with rb_col:
+        qb_rb = st.number_input('', min_value = -1, max_value = 1, value = st.session_state['correlation_dict']['QB']['RB'])
+        st.session_state['correlation_dict']['QB']['RB'] = qb_rb
         
     
