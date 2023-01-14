@@ -136,7 +136,7 @@ with correlations_tab:
     with qb_col:
         st.write(1)
     with rb_col:
-        qb_rb = st.number_input('', min_value = -1, max_value = 1, value = st.session_state['correlation_dict']['QB']['RB'])
-        st.session_state['correlation_dict']['QB']['RB'] = qb_rb
+        qb_rb = st.number_input('', min_value = -1, max_value = 1, value = st.session_state['correlation dict']['QB']['RB'])
+        st.session_state['correlation dict']['QB']['RB'] = qb_rb
         
     
