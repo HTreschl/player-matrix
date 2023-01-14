@@ -181,13 +181,3 @@ def lineup_parser(lineups, crit):
     counts = pd.DataFrame(counts).rename(columns = {'Name':'Count'}).reset_index().sort_values(by = 'Count', ascending=False)
     return counts
 
-
-#%%
-df = pd.read_excel('NFL DK Projections.xlsx')
-#df = df[(df['Team'] == 'DEN') | (df['Team'] == 'IND')]
-s,lineups = standard_sims(df,'nfl', 10,fpts_col_name='avg fpts', ceil_column = 'avg ceil', floor_column = 'avg floor', include_correlations=True)
-team_opt = get_team_optimal(s)
-writer = pd.ExcelWriter('sims.xlsx', engine='xlsxwriter')
-s.to_excel(writer, sheet_name='Sims')
-team_opt.to_excel(writer, sheet_name = 'By Team')
-matches = parse_lineup_list(lineups)
