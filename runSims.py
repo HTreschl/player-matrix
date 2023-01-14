@@ -10,43 +10,50 @@ import pandas as pd
 import numpy as np
 pd.options.mode.chained_assignment = None
 
-#relevant correlations -- .66 for QB/WR and .33 for QB/TE
 
-
-def scramble_projections(df, fpts_column, ceil_column=None, floor_column=None, include_correlations = False):
+def scramble_projections(df, fpts_column,correlation_values = None, ceil_column=None, floor_column=None):
     '''
     returns a formatted dataframe of scrambled fpts results for players in a dataframe
     
-    current correlations are .66 for QB/WR and .33 for QB/TE
+    correlations passed as nested dict; nulls should be passed as 0's'
+    
+    TO: add correlation for opponents
     '''
-    #prep work, full nulls
-    df[ceil_column] = df[ceil_column].fillna(df[fpts_column]*2)
-    df[floor_column] = df[floor_column].fillna(df[fpts_column]/2)
-    fpts_values = list(df[fpts_column])
-    if include_correlations: #get correlated results
-        slice_list = [] #placeholder for df slices
-        qbs = df[df['Pos']=='QB']
-        qbs['results'] = [np.random.normal(1,1) for i in range(len(qbs))]
-        slice_list.append(qbs)
-        for team in qbs['Team']:
-            team_result = qbs.loc[qbs['Team']==team, 'results'].reset_index().at[0, 'results']
-            wr_sl = df[(df['Pos']=='WR') & (df['Team']==team)]
-            wr_sl['results'] = [np.random.normal(team_result*.66, 1) for i in range(len(wr_sl))]
-            te_sl = df[(df['Pos']=='TE') & (df['Team']==team)]
-            te_sl['results'] = [np.random.normal(team_result*.33, 1) for i in range(len(te_sl))]
-            slice_list.append(wr_sl)
-            slice_list.append(te_sl)
-        correlated_results = pd.concat(slice_list)[['results']]
-        tmp = df.merge(correlated_results, how = 'left', left_index=True, right_index = True)
-        tmp = tmp.drop_duplicates(subset = ['Name','Team',fpts_column])
-        tmp['results'] = [np.random.normal(1,1) if np.isnan(x) else x for x in tmp['results']]
-        res = list(tmp['results'])
-    else: #get randomized results, no correlations
-        res = [np.random.normal(1,1) for i in range(len(fpts_values))]
+    #store variables
+    qb_correlated_positions = list(correlation_values['QB'].keys())
+    #prep work, fill nulls
+    if ceil_column:
+        df[ceil_column] = df[ceil_column].fillna(df[fpts_column]*2)
+    if floor_column:
+        df[floor_column] = df[floor_column].fillna(df[fpts_column]/2)
+        
+    fpts_values = list(df[fpts_column]) #predicted fpts values
+    slice_list = [] #placeholder for df slices
+    
+    #get QB results
+    qbs = df[df['Pos']=='QB']
+    qbs['results'] = [np.random.normal(1,1) for i in range(len(qbs))]
+    slice_list.append(qbs)
+    
+    #get other results -- same team
+    for team in qbs['Team']:
+        team_qb_result = qbs.loc[qbs['Team']==team, 'results'].reset_index().at[0, 'results'] #the value for that teams' QB; use as base for the other slices
+        opponent_qb_result = qbs.loc[qbs['Opp']==team, 'results'].reset_index().at[0, 'results']
+        net_qb_result = team_qb_result + (opponent_qb_result*correlation_values['QB']['Opp_QB'])
+        for pos in qb_correlated_positions:
+            pos_sl = df[(df['Pos'] == pos) & (df['Team'] == team)]
+            pos_sl['results'] = [np.random.normal(net_qb_result*correlation_values['QB'][pos],1) for i in range(len(pos_sl))]
+            slice_list.append(pos_sl)
+    correlated_results = pd.concat(slice_list)[['results']]
+    tmp = df.merge(correlated_results, how = 'left', left_index=True, right_index = True)
+    tmp = tmp.drop_duplicates(subset = ['Name','Team',fpts_column])
+    #fill the empties with simple random values
+    tmp['results'] = [np.random.normal(1,1) if np.isnan(x) else x for x in tmp['results']]
+    res = list(tmp['results'])
 
     #generate fpts values
     observed_results = []
-    if ceil_column and floor_column:
+    if ceil_column and floor_column: #ceiling and floor supplied
         ceil_column = list(df[ceil_column])
         floor_column = list(df[floor_column])
         results_arr = np.array((fpts_values, ceil_column, floor_column, res))
@@ -60,15 +67,12 @@ def scramble_projections(df, fpts_column, ceil_column=None, floor_column=None, i
                 ceil_dist = results_arr[1,i] - results_arr[0,i]
                 r = results_arr[0,i] + (ceil_dist*mean_dist)
                 observed_results.append(r)
-    else: 
+    else: #no ceiling and floor
         observed_results = [res[i]*fpts_values[i] for i in range(len(fpts_values))]
     return observed_results
 
-def nfl_correlated_projections():
-    return ''
-        
 
-def standard_sims(df, sport, count, fpts_col_name='Fpts', ceil_column=None, floor_column=None,ownership_column = None, include_correlations=False):
+def standard_sims(df, sport, count,correlation_values = {'QB':{'WR':.66, 'TE':.33, 'Opp_QB':0.0}}, fpts_col_name='Fpts', ceil_column=None, floor_column=None,ownership_column = None, include_correlations=False):
     '''
     returns a datarame of optimal rates as well as an array of simulated winning lineups
     
@@ -88,7 +92,7 @@ def standard_sims(df, sport, count, fpts_col_name='Fpts', ceil_column=None, floo
     lineup_list = []
     
     for i in range(count):
-        df['Observed Fpts'] = scramble_projections(df, fpts_col_name, ceil_column, floor_column, include_correlations=include_correlations)
+        df['Observed Fpts'] = scramble_projections(correlation_values, df, fpts_col_name, ceil_column, floor_column)
         lineup = optimizer(df, objective_fn_column='Observed Fpts')
         lineup_list.append(set(lineup))
         
@@ -177,6 +181,7 @@ def lineup_parser(lineups, crit):
     counts = pd.DataFrame(flat_lineups, columns=['Name']).groupby('Name')['Name'].count()
     counts = pd.DataFrame(counts).rename(columns = {'Name':'Count'}).reset_index().sort_values(by = 'Count', ascending=False)
     return counts
+
 
 
 
