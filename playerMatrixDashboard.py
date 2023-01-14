@@ -130,13 +130,16 @@ else: #no valid data
         
 #correlations section
 with correlations_tab:
-    ref_col, qb_col, rb_col, te_col, opp_qb_col, opp_rb_col, opp_wr_col, opp_te_col = st.columns(8)
-    with ref_col:
-        st.write('QB')
-    with qb_col:
-        st.write(1.0)
-    with rb_col:
-        qb_rb = st.number_input('RB', min_value = -1.0, max_value = 1.0, value = st.session_state['correlation dict']['QB']['RB'])
-        st.session_state['correlation dict']['QB']['RB'] = qb_rb
+    #order: qb,rb,wr,te,opp qb, opp rb, opp wr, opp te
+    corr_dict = st.session_state['correlation dict']
+    pos_list = ['QB','RB','WR','TE','Opp QB','Opp RB','Opp WR','Opp TE']
+    qb_rb = corr_dict['QB']['RB']
+    qb_wr = corr_dict['QB']['WR']
+    qb_te = corr_dict['QB']['TE']
+    qb_opp_qb = corr_dict['QB']['Opp_QB']
+    correlations_array = {'QB':[1,qb_rb,qb_wr,qb_te,qb_opp_qb,qb_opp_qb*qb_rb, qb_opp_qb*qb_wr, qb_opp_qb*qb_te]}
+    corr_df = pd.DataFrame(correlations_array, index = pos_list)
+    st.dataframe(corr_df)
+    
         
     
