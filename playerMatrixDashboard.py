@@ -91,7 +91,8 @@ if has_valid_data:
         sims_button = st.button('Run Sims')
         
     if sims_button: #run the sims
-        sims_results,lineups = sims.standard_sims(st.session_state['input data'], 'nfl', count, fpts_col_name='Fpts', ceil_column = 'Ceil', floor_column = 'Floor', include_correlations=True)
+        status_bar = st.progress(0)
+        sims_results,lineups = sims.standard_sims(st.session_state['input data'], 'nfl', count,correlation_value = st.session_state['correlation dict'], fpts_col_name='Fpts', ceil_column = 'Ceil', floor_column = 'Floor', status_bar=status_bar)
         st.session_state['sim results'] = sims_results
         st.session_state['lineups'] = lineups
         st.session_state['sim count'] = count
@@ -140,6 +141,3 @@ with correlations_tab:
     correlations_array = {'QB':[1,qb_rb,qb_wr,qb_te,qb_opp_qb,qb_opp_qb*qb_rb, qb_opp_qb*qb_wr, qb_opp_qb*qb_te]}
     corr_df = pd.DataFrame(correlations_array, index = pos_list)
     st.dataframe(corr_df)
-    
-        
-    
