@@ -72,6 +72,7 @@ with data_tab:
 
 if sample_button:
     st.session_state['input data'] = sample_data
+    has_valid_data = controller.data_checker(st.session_state['input data'])
 
 if dat is not None:
     df = pd.read_csv(dat)
@@ -92,7 +93,7 @@ if has_valid_data:
         
     if sims_button: #run the sims
         status_bar = st.progress(0)
-        sims_results,lineups = sims.standard_sims(st.session_state['input data'], 'nfl', count,correlation_value = st.session_state['correlation dict'], fpts_col_name='Fpts', ceil_column = 'Ceil', floor_column = 'Floor', status_bar=status_bar)
+        sims_results,lineups = sims.standard_sims(st.session_state['input data'], 'nfl', count,correlation_values = st.session_state['correlation dict'], fpts_col_name='Fpts', ceil_column = 'Ceil', floor_column = 'Floor', status_bar=status_bar)
         st.session_state['sim results'] = sims_results
         st.session_state['lineups'] = lineups
         st.session_state['sim count'] = count
@@ -141,3 +142,5 @@ with correlations_tab:
     correlations_array = {'QB':[1,qb_rb,qb_wr,qb_te,qb_opp_qb,qb_opp_qb*qb_rb, qb_opp_qb*qb_wr, qb_opp_qb*qb_te]}
     corr_df = pd.DataFrame(correlations_array, index = pos_list)
     st.dataframe(corr_df)
+    
+      
