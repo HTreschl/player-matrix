@@ -72,7 +72,7 @@ def scramble_projections(df, fpts_column,correlation_values = None, ceil_column=
     return observed_results
 
 
-def standard_sims(df, sport, count,correlation_values = {'QB':{'WR':.66, 'TE':.33, 'Opp_QB':0.0}}, fpts_col_name='Fpts', ceil_column=None, floor_column=None,ownership_column = None, include_correlations=False):
+def standard_sims(df, sport, count,correlation_values = {'QB':{'WR':.66, 'TE':.33, 'Opp_QB':0.0}}, fpts_col_name='Fpts', ceil_column=None, floor_column=None,ownership_column = None,status_bar=None):
     '''
     returns a datarame of optimal rates as well as an array of simulated winning lineups
     
@@ -94,6 +94,8 @@ def standard_sims(df, sport, count,correlation_values = {'QB':{'WR':.66, 'TE':.3
         df['Observed Fpts'] = scramble_projections(df, fpts_col_name,correlation_values, ceil_column, floor_column)
         lineup = optimizer(df, objective_fn_column='Observed Fpts')
         lineup_list.append(set(lineup))
+        if status_bar:
+            status_bar.progress((i/count)*100)
         
 
     player_list = []
@@ -116,68 +118,3 @@ def standard_sims(df, sport, count,correlation_values = {'QB':{'WR':.66, 'TE':.3
     df = df.sort_values(by = ['Pos','Optimal Ownership'], ascending = False).set_index('Name')
     df = df[df['Optimal Ownership'].isnull()==False]
     return df, lineup_list
-
-def showdown_sims(df, count, fpts_column, ceil_column = None, floor_column = None):
-
-    model = opt.NFL(df=df)
-    
-    lineup_list = []
-    
-    for i in range(count):
-        df['observed fpts'] = scramble_projections(df, fpts_column, ceil_column, floor_column)
-        lineup = model.showdown_optimizer(df, 'observed fpts')
-        lineup_list.append(lineup)
-    
-    player_list = []
-    for lineup in lineup_list:
-        for player in lineup:
-            player_list.append(player)
-    
-    counts = pd.DataFrame(player_list).rename(columns = {0 : 'Name'}).value_counts()
-    counts = pd.DataFrame(counts).rename(columns = {0 : 'Count'}).reset_index()
-    cpt = counts[counts['Name'].str.contains('cpt')].rename(columns = {'Count':'Cpt Count'})
-    cpt['Name'] = [x[:-4] for x in cpt['Name']]
-    
-    df = df.merge(counts, how='right', on='Name')
-    df = df.merge(cpt, how='left', on='Name')
-    df = df[df['Name'].str.contains(' cpt')==False]
-    df['Optimal Ownership'] = df['Count']/count
-    df['optimal Cpt'] = df['Cpt Count']/count
-    
-    #df.to_excel('showdown optimal Ownership.xlsx')
-    
-    return df
-
-def get_team_optimal(sims, include_defense = False, include_rb = False):
-    if not include_defense:
-        sims = sims[sims['Pos']!= 'DST']
-    if not include_rb:
-        sims = sims[sims['Pos']!= 'RB']
-    res = sims.groupby('Team')[['Leverage', 'Optimal Ownership']].sum()
-    return res
-
-def parse_lineup_list(lineups):
-    '''
-    given a list of lists made up of that sims optimal, returns the most common player pairings for each player
-    '''
-    players = set()
-    for lineup in lineups:
-        [players.add(x) for x in lineup]
-      
-    players = list(players)
-    res_dict = {}    
-    for player in players:
-        rel_lineups = [x for x in lineups if player in x]
-        flat_lineups = [x for y in rel_lineups for x in y]
-        counts = pd.DataFrame(flat_lineups, columns=['Name']).groupby('Name')['Name'].count()
-        counts = pd.DataFrame(counts).rename(columns = {'Name':'Count'}).reset_index().sort_values(by = 'Count', ascending=False)
-        res_dict[player] = counts
-    return res_dict
-        
-def lineup_parser(lineups, crit):
-    rel_lineups = [x for x in lineups if crit.issubset(x)]
-    flat_lineups = [x for y in rel_lineups for x in y]
-    counts = pd.DataFrame(flat_lineups, columns=['Name']).groupby('Name')['Name'].count()
-    counts = pd.DataFrame(counts).rename(columns = {'Name':'Count'}).reset_index().sort_values(by = 'Count', ascending=False)
-    return counts
-
