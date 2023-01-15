@@ -95,7 +95,7 @@ def standard_sims(df, sport, count,correlation_values = {'QB':{'WR':.66, 'TE':.3
         lineup = optimizer(df, objective_fn_column='Observed Fpts')
         lineup_list.append(set(lineup))
         if status_bar:
-            status_bar.progress((i/count)*100)
+            status_bar.progress(i/count)
         
 
     player_list = []
@@ -118,3 +118,13 @@ def standard_sims(df, sport, count,correlation_values = {'QB':{'WR':.66, 'TE':.3
     df = df.sort_values(by = ['Pos','Optimal Ownership'], ascending = False).set_index('Name')
     df = df[df['Optimal Ownership'].isnull()==False]
     return df, lineup_list
+
+
+
+
+
+
+
+
+
+
