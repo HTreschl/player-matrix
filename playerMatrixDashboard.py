@@ -133,10 +133,19 @@ else: #no valid data
         
 #correlations section
 with correlations_tab:
-    corr_df = controller.parse_correlation_to_df(st.session_state['correlation dict'])
-    st.table(corr_df)
-    st.session_state['correlation dict']['QB']['RB'] = st.number_input('QB:RB Correlation', min_value = -1.0, max_value = 1.0, value = st.session_state['correlation dict']['QB']['RB'])
+    st.session_state['correlation dict']['QB']['RB'] = st.number_input('QB - RB', min_value = -1.0, max_value = 1.0, value = st.session_state['correlation dict']['QB']['RB'])
+    st.session_state['correlation dict']['QB']['WR'] = st.number_input('QB - WR', min_value = -1.0, max_value = 1.0, value = st.session_state['correlation dict']['QB']['WR'])
+    st.session_state['correlation dict']['QB']['TE'] = st.number_input('QB - TE', min_value = -1.0, max_value = 1.0, value = st.session_state['correlation dict']['QB']['TE'])
+    st.session_state['correlation dict']['QB']['Opp_QB'] = st.number_input('QB - Opposing QB', min_value = -1.0, max_value = 1.0, value = st.session_state['correlation dict']['QB']['Opp_QB'])
+    reset_correlations = st.button('Reset')
+    if reset_correlations:
+        st.session_state['correlation dict'] = controller.reset_correlations()
+        corr_df = controller.parse_correlation_to_df(st.session_state['correlation dict'])
+        st.table(corr_df)
+    else:
+        corr_df = controller.parse_correlation_to_df(st.session_state['correlation dict'])
+        st.table(corr_df)       
     
     
+        
     
-     
