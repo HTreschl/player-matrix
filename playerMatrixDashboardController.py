@@ -26,3 +26,16 @@ def data_checker(df):
     else:
         return False
     
+@st.cache
+def parse_correlation_to_df(corr_dict):
+    pos_list = ['QB','RB','WR','TE','Opp QB','Opp RB','Opp WR','Opp TE']
+    qb_rb = corr_dict['QB']['RB']
+    qb_wr = corr_dict['QB']['WR']
+    qb_te = corr_dict['QB']['TE']
+    opp_qb = corr_dict['QB']['Opp_QB']
+    correlations_array = {'QB':[1,qb_rb,qb_wr,qb_te,opp_qb,opp_qb*qb_rb, opp_qb*qb_wr, opp_qb*qb_te],
+                          'RB': [qb_rb, 1, qb_rb*qb_wr, qb_rb*qb_te, opp_qb*qb_rb, opp_qb*qb_rb*qb_rb, opp_qb*qb_rb*qb_wr, opp_qb*qb_rb*qb_te],
+                          'WR': [qb_wr, qb_wr*qb_rb, 1, qb_wr*qb_te, opp_qb*qb_wr, opp_qb*qb_wr*qb_rb, opp_qb*qb_wr*qb_wr, opp_qb*qb_wr*qb_te],
+                          'TE': [qb_te, qb_te*qb_rb, qb_te*qb_wr, 1, opp_qb*qb_te, opp_qb*qb_te*qb_rb, opp_qb*qb_te*qb_wr, opp_qb*qb_wr*qb_te]}
+    corr_df = pd.DataFrame(correlations_array, index = pos_list)
+    return corr_df
