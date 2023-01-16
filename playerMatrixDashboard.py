@@ -94,6 +94,7 @@ if has_valid_data:
     if sims_button: #run the sims
         status_bar = st.progress(0)
         sims_results,lineups = sims.standard_sims(st.session_state['input data'], 'nfl', count,correlation_values = st.session_state['correlation dict'], fpts_col_name='Fpts', ceil_column = 'Ceil', floor_column = 'Floor', status_bar=status_bar)
+        status_bar.empty()
         st.session_state['sim results'] = sims_results
         st.session_state['lineups'] = lineups
         st.session_state['sim count'] = count
@@ -132,15 +133,10 @@ else: #no valid data
         
 #correlations section
 with correlations_tab:
-    #order: qb,rb,wr,te,opp qb, opp rb, opp wr, opp te
-    corr_dict = st.session_state['correlation dict']
-    pos_list = ['QB','RB','WR','TE','Opp QB','Opp RB','Opp WR','Opp TE']
-    qb_rb = corr_dict['QB']['RB']
-    qb_wr = corr_dict['QB']['WR']
-    qb_te = corr_dict['QB']['TE']
-    qb_opp_qb = corr_dict['QB']['Opp_QB']
-    correlations_array = {'QB':[1,qb_rb,qb_wr,qb_te,qb_opp_qb,qb_opp_qb*qb_rb, qb_opp_qb*qb_wr, qb_opp_qb*qb_te]}
-    corr_df = pd.DataFrame(correlations_array, index = pos_list)
-    st.dataframe(corr_df)
+    corr_df = controller.parse_correlation_to_df(st.session_state['correlation dict'])
+    st.table(corr_df)
+    st.session_state['correlation dict']['QB']['RB'] = st.number_input('QB:RB Correlation', min_value = -1.0, max_value = 1.0, value = st.session_state['correlation dict']['QB']['RB'])
     
-      
+    
+    
+     
