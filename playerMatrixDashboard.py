@@ -139,7 +139,7 @@ with correlations_tab:
     st.session_state['correlation dict']['QB']['Opp_QB'] = st.number_input('QB - Opposing QB', min_value = -1.0, max_value = 1.0, value = st.session_state['correlation dict']['QB']['Opp_QB'])
     reset_correlations = st.button('Reset')
     if reset_correlations:
-        st.session_state['correlation dict'] = controller.reset_correlations()
+        st.session_state['correlation dict'] = controller.get_default_correlations()
         corr_df = controller.parse_correlation_to_df(st.session_state['correlation dict'])
         st.table(corr_df)
     else:
