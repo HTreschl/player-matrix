@@ -47,7 +47,14 @@ with intro_tab:
 
 #get data from upload, data sample, and example download
 with data_tab:
-    data_container = st.container()
+    dat = st.file_uploader('Upload CSV Player Data Here')
+    col1,col2 = st.columns(2)
+    
+    with col1:
+        st.download_button('Download a Template', data = sample_data.to_csv().encode('utf-8'), file_name = 'Sample DFS Data.csv')
+        st.caption('Replace column values with your own projections. Ceiling, floor, and ownership columns are optional.')
+    with col2:
+        sample_button = st.button('Use Sample Data')
 
 if sample_button:
     st.session_state['input data'] = sample_data
@@ -149,14 +156,5 @@ with intro_container:
                  Once you've run the sims, dive into the data in the "explore Relationships" section.
                  ''')
                  
-with data_container:
-    dat = st.file_uploader('Upload CSV Player Data Here')
-    col1,col2 = st.columns(2)
-    
-    with col1:
-        st.download_button('Download a Template', data = sample_data.to_csv().encode('utf-8'), file_name = 'Sample DFS Data.csv')
-        st.caption('Replace column values with your own projections. Ceiling, floor, and ownership columns are optional.')
-    with col2:
-        sample_button = st.button('Use Sample Data')
         
     
