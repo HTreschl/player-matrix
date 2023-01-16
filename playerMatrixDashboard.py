@@ -34,6 +34,7 @@ if 'correlation dict' not in st.session_state:
 #set global constants
 has_valid_data = controller.data_checker(st.session_state['input data'])
 
+#%%app layout and logic
 #initial tab layout and title
 st.title('DFS Degrees of Separation')
 intro_tab, data_tab, sims_tab, relationships_tab, correlations_tab = st.tabs(['What is this?','Import Projections','Run Sims', 'Explore Relationships', 'Edit Correlations'])
@@ -41,34 +42,12 @@ intro_tab, data_tab, sims_tab, relationships_tab, correlations_tab = st.tabs(['W
 
 #write documentation
 with intro_tab:
-    st.header('FAQ')
-    with st.expander('What does this tool do?'):
-        st.write('''The degrees of separation tool allows you to run game simulations using your own player projections and quickly visualize the frequency with which players appear together.
-                 For example, if you are building a stack with Allen, you might want to know whether the sims find a 1,2, or 3 receiver stack most frequently in the optimal lineups.
-                 The tool also includes the ability to run sims for all players and determine the optimal frequency a player will appear.
-                 ''')
-    with st.expander('How can this help me?'):
-        st.write('''We all know stacking teams and maximizing within-lineup correlation is key to profitably playing DFS. However, there is also a tradeoff for correlation in lineup ceiling. 
-                 Let's say you want Mahomes and Kelce in a lineup. It might be tempting to include Smith-Schuster for the correlation, but he might not be the highest projected receiver at
-                 that pricepoint. This tool runs the sims and presents the tradeoff between correlation and ceiling.
-                 ''')
-    with st.expander('How do I use it?'):
-        st.write('''For starters, you'll need to upload a csv file with your player projections in the "Import Projections" tab. A schematic sheet is 
-                 available for download for example formatting (WIP). Once you've uploaded projections, you can run sims and get the mathematically optimal play rate for each player. 
-                 Once you've run the sims, dive into the data in the "explore Relationships" section.
-                 ''')
+    intro_container = st.container()
                  
 
 #get data from upload, data sample, and example download
 with data_tab:
-    dat = st.file_uploader('Upload CSV Player Data Here')
-    col1,col2 = st.columns(2)
-    
-    with col1:
-        st.download_button('Download a Template', data = sample_data.to_csv().encode('utf-8'), file_name = 'Sample DFS Data.csv')
-        st.caption('Replace column values with your own projections. Ceiling, floor, and ownership columns are optional.')
-    with col2:
-        sample_button = st.button('Use Sample Data')
+    data_container = st.container()
 
 if sample_button:
     st.session_state['input data'] = sample_data
@@ -133,19 +112,51 @@ else: #no valid data
         
 #correlations section
 with correlations_tab:
-    st.session_state['correlation dict']['QB']['RB'] = st.number_input('QB - RB', min_value = -1.0, max_value = 1.0, value = st.session_state['correlation dict']['QB']['RB'])
-    st.session_state['correlation dict']['QB']['WR'] = st.number_input('QB - WR', min_value = -1.0, max_value = 1.0, value = st.session_state['correlation dict']['QB']['WR'])
-    st.session_state['correlation dict']['QB']['TE'] = st.number_input('QB - TE', min_value = -1.0, max_value = 1.0, value = st.session_state['correlation dict']['QB']['TE'])
-    st.session_state['correlation dict']['QB']['Opp_QB'] = st.number_input('QB - Opposing QB', min_value = -1.0, max_value = 1.0, value = st.session_state['correlation dict']['QB']['Opp_QB'])
+    corr1,corr2,corr3,corr4 = st.columns(4)
+    with corr1:
+        st.session_state['correlation dict']['QB']['RB'] = st.number_input('QB - RB', min_value = -1.0, max_value = 1.0, value = st.session_state['correlation dict']['QB']['RB'])
+    with corr2:
+        st.session_state['correlation dict']['QB']['WR'] = st.number_input('QB - WR', min_value = -1.0, max_value = 1.0, value = st.session_state['correlation dict']['QB']['WR'])
+    with corr3:
+        st.session_state['correlation dict']['QB']['TE'] = st.number_input('QB - TE', min_value = -1.0, max_value = 1.0, value = st.session_state['correlation dict']['QB']['TE'])
+    with corr4:
+        st.session_state['correlation dict']['QB']['Opp_QB'] = st.number_input('QB - Opposing QB', min_value = -1.0, max_value = 1.0, value = st.session_state['correlation dict']['QB']['Opp_QB'])
     reset_correlations = st.button('Reset')
     if reset_correlations:
-        st.session_state['correlation dict'] = controller.get_default_correlations()
+        st.session_state['correlation dict'] = controller.reset_correlations()
         corr_df = controller.parse_correlation_to_df(st.session_state['correlation dict'])
         st.table(corr_df)
     else:
         corr_df = controller.parse_correlation_to_df(st.session_state['correlation dict'])
         st.table(corr_df)       
+
+#%%components and logic    
+with intro_container:
+    st.header('FAQ')
+    with st.expander('What does this tool do?'):
+        st.write('''The degrees of separation tool allows you to run game simulations using your own player projections and quickly visualize the frequency with which players appear together.
+                 For example, if you are building a stack with Allen, you might want to know whether the sims find a 1,2, or 3 receiver stack most frequently in the optimal lineups.
+                 The tool also includes the ability to run sims for all players and determine the optimal frequency a player will appear.
+                 ''')
+    with st.expander('How can this help me?'):
+        st.write('''We all know stacking teams and maximizing within-lineup correlation is key to profitably playing DFS. However, there is also a tradeoff for correlation in lineup ceiling. 
+                 Let's say you want Mahomes and Kelce in a lineup. It might be tempting to include Smith-Schuster for the correlation, but he might not be the highest projected receiver at
+                 that pricepoint. This tool runs the sims and presents the tradeoff between correlation and ceiling.
+                 ''')
+    with st.expander('How do I use it?'):
+        st.write('''For starters, you'll need to upload a csv file with your player projections in the "Import Projections" tab. A schematic sheet is 
+                 available for download for example formatting (WIP). Once you've uploaded projections, you can run sims and get the mathematically optimal play rate for each player. 
+                 Once you've run the sims, dive into the data in the "explore Relationships" section.
+                 ''')
+                 
+with data_container:
+    dat = st.file_uploader('Upload CSV Player Data Here')
+    col1,col2 = st.columns(2)
     
-    
+    with col1:
+        st.download_button('Download a Template', data = sample_data.to_csv().encode('utf-8'), file_name = 'Sample DFS Data.csv')
+        st.caption('Replace column values with your own projections. Ceiling, floor, and ownership columns are optional.')
+    with col2:
+        sample_button = st.button('Use Sample Data')
         
     
