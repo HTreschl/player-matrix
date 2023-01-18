@@ -132,10 +132,10 @@ with correlations_tab:
     if reset_correlations:
         st.session_state['correlation dict'] = controller.reset_correlations()
         corr_df = controller.parse_correlation_to_df(st.session_state['correlation dict'])
-        st.table(corr_df.style.background_gradient)
+        st.table(corr_df.style.background_gradient())
     else:
         corr_df = controller.parse_correlation_to_df(st.session_state['correlation dict'])
-        st.table(corr_df.style.background_gradient)       
+        st.table(corr_df.style.background_gradient())       
 
 #%%components and logic    
 with intro_container:
