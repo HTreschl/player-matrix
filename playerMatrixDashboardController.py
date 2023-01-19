@@ -36,7 +36,11 @@ def parse_correlation_to_df(corr_dict):
     correlations_array = {'QB':[1,qb_rb,qb_wr,qb_te,opp_qb,opp_qb*qb_rb, opp_qb*qb_wr, opp_qb*qb_te],
                           'RB': [qb_rb, 1, qb_rb*qb_wr, qb_rb*qb_te, opp_qb*qb_rb, opp_qb*qb_rb*qb_rb, opp_qb*qb_rb*qb_wr, opp_qb*qb_rb*qb_te],
                           'WR': [qb_wr, qb_wr*qb_rb, 1, qb_wr*qb_te, opp_qb*qb_wr, opp_qb*qb_wr*qb_rb, opp_qb*qb_wr*qb_wr, opp_qb*qb_wr*qb_te],
-                          'TE': [qb_te, qb_te*qb_rb, qb_te*qb_wr, 1, opp_qb*qb_te, opp_qb*qb_te*qb_rb, opp_qb*qb_te*qb_wr, opp_qb*qb_wr*qb_te]}
+                          'TE': [qb_te, qb_te*qb_rb, qb_te*qb_wr, 1, opp_qb*qb_te, opp_qb*qb_te*qb_rb, opp_qb*qb_te*qb_wr, opp_qb*qb_wr*qb_te],
+                          'Opp QB': [opp_qb,opp_qb*qb_rb, opp_qb*qb_wr, opp_qb*qb_te,1,qb_rb,qb_wr,qb_te],
+                          'Opp RB': [opp_qb*qb_rb, opp_qb*qb_rb*qb_rb, opp_qb*qb_rb*qb_wr, opp_qb*qb_rb*qb_te,qb_rb, 1, qb_rb*qb_wr, qb_rb*qb_te],
+                          'Opp WR': [opp_qb*qb_wr, opp_qb*qb_wr*qb_rb, opp_qb*qb_wr*qb_wr, opp_qb*qb_wr*qb_te,qb_wr, qb_wr*qb_rb, 1, qb_wr*qb_te],
+                          'Opp TE': [opp_qb*qb_te, opp_qb*qb_te*qb_rb, opp_qb*qb_te*qb_wr, opp_qb*qb_wr*qb_te,qb_te, qb_te*qb_rb, qb_te*qb_wr, 1]}
     corr_df = pd.DataFrame(correlations_array, index = pos_list)
     return corr_df
 
