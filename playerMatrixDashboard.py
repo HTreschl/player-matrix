@@ -36,7 +36,7 @@ has_valid_data = controller.data_checker(st.session_state['input data'])
 
 #%%app layout and logic
 #initial tab layout and title
-st.title('DFS Degrees of Separation')
+st.title('RosterTech')
 intro_tab, data_tab, sims_tab, relationships_tab, correlations_tab = st.tabs(['What is this?','Import Projections','Run Sims', 'Explore Relationships', 'Edit Correlations'])
 
 
@@ -155,6 +155,3 @@ with intro_container:
                  available for download for example formatting (WIP). Once you've uploaded projections, you can run sims and get the mathematically optimal play rate for each player. 
                  Once you've run the sims, dive into the data in the "explore Relationships" section.
                  ''')
-                 
-        
-    
