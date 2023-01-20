@@ -51,7 +51,7 @@ with data_tab:
     col1,col2 = st.columns(2)
     
     with col1:
-        st.download_button('Download a Template', data = sample_data.to_csv().encode('utf-8'), file_name = 'Sample DFS Data.csv')
+        st.download_button('Download a Template', data = sample_data.to_csv(index=False).encode('utf-8'), file_name = 'Sample DFS Data.csv')
         st.caption('Replace column values with your own projections. Ceiling, floor, and ownership columns are optional.')
     with col2:
         sample_button = st.button('Use Sample Data')
@@ -155,3 +155,5 @@ with intro_container:
                  available for download for example formatting (WIP). Once you've uploaded projections, you can run sims and get the mathematically optimal play rate for each player. 
                  Once you've run the sims, dive into the data in the "explore Relationships" section.
                  ''')
+                 
+    
