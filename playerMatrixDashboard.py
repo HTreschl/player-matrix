@@ -52,7 +52,7 @@ with data_tab:
     
     with col1:
         st.download_button('Download a Template', data = sample_data.to_csv(index=False).encode('utf-8'), file_name = 'Sample DFS Data.csv')
-        st.caption('Replace column values with your own projections. Ceiling, floor, and ownership columns are optional.')
+        st.caption('Replace column values with your own projections. Ownnership column is optional.')
     with col2:
         sample_button = st.button('Use Sample Data')
 
@@ -79,7 +79,11 @@ if has_valid_data:
         
     if sims_button: #run the sims
         status_bar = st.progress(0)
-        sims_results,lineups = sims.standard_sims(st.session_state['input data'], 'nfl', count,correlation_values = st.session_state['correlation dict'], fpts_col_name='Fpts', ceil_column = 'Ceil', floor_column = 'Floor', status_bar=status_bar)
+        if 'Ownership' in list(st.session_state['input data'].columns):
+            ownership_col = 'Ownership'
+        else:
+            ownership_col = None
+        sims_results,lineups = sims.standard_sims(st.session_state['input data'], 'nfl', count,correlation_values = st.session_state['correlation dict'], fpts_col_name='Fpts', ceil_column = 'Ceil', floor_column = 'Floor',ownership_column=ownership_col, status_bar=status_bar)
         status_bar.empty()
         st.session_state['sim results'] = sims_results
         st.session_state['lineups'] = lineups
@@ -156,4 +160,5 @@ with intro_container:
                  Once you've run the sims, dive into the data in the "explore Relationships" section.
                  ''')
                  
-    
+        
+ 
