@@ -6,7 +6,7 @@ Created on Mon Jan  9 15:54:51 2023
 """
 import pandas as pd
 import streamlit as st
-
+import Optimizer as opt
 
 def lineup_parser(lineups, crit):
     '''parses a list of lineups based on passed criteria'''
@@ -17,10 +17,15 @@ def lineup_parser(lineups, crit):
     return counts
 
 @st.cache
-def data_checker(df):
+def data_checker(df, sport):
     '''checks if the current supplied data is valid'''
     columns = list(df.columns)
-    expected_columns = ['Name','Team','Opp','Pos','Salary','Fpts']
+    if sport =='NFL':
+        expected_columns = ['Name','Team','Opp','Pos','Salary','Fpts']
+    elif sport == 'MLB':
+        expected_columns = ['Name','Team','Opp','Position','Salary']
+    else:
+        return False
     if (all(x in columns for x in expected_columns)):
         return True
     else:
@@ -47,3 +52,9 @@ def parse_correlation_to_df(corr_dict):
 @st.cache
 def get_default_correlations():
     return {'QB':{'WR':.66, 'TE':.33, 'RB':.08, 'Opp_QB':.24}}
+
+@st.cache
+def get_baseline_optimal(df):
+    result = opt.NFL(df).standard_optimizer(df, objective_fn_column='Fpts')
+    res_df = df[df['Name'].isin(result)]
+    return res_df
