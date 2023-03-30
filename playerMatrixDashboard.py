@@ -139,24 +139,25 @@ if st.session_state['sport'] != '':
             
     #correlations section
     #TODO: make dynamic
-    with correlations_tab:
-        corr1,corr2,corr3,corr4 = st.columns(4)
-        with corr1:
-            st.session_state['correlation dict']['QB']['RB'] = st.number_input('QB - RB', min_value = -1.0, max_value = 1.0, value = st.session_state['correlation dict']['QB']['RB'])
-        with corr2:
-            st.session_state['correlation dict']['QB']['WR'] = st.number_input('QB - WR', min_value = -1.0, max_value = 1.0, value = st.session_state['correlation dict']['QB']['WR'])
-        with corr3:
-            st.session_state['correlation dict']['QB']['TE'] = st.number_input('QB - TE', min_value = -1.0, max_value = 1.0, value = st.session_state['correlation dict']['QB']['TE'])
-        with corr4:
-            st.session_state['correlation dict']['QB']['Opp_QB'] = st.number_input('QB - Opposing QB', min_value = -1.0, max_value = 1.0, value = st.session_state['correlation dict']['QB']['Opp_QB'])
-        reset_correlations = st.button('Reset')
-        if reset_correlations:
-            st.session_state['correlation dict'] = controller.get_default_correlations()
-            corr_df = controller.parse_correlation_to_df(st.session_state['correlation dict'])
-            st.table(corr_df.style.background_gradient())
-        else:
-            corr_df = controller.parse_correlation_to_df(st.session_state['correlation dict'])
-            st.table(corr_df.style.background_gradient())       
+    if st.session_state['sport'] == 'NFL':
+        with correlations_tab:
+            corr1,corr2,corr3,corr4 = st.columns(4)
+            with corr1:
+                st.session_state['correlation dict']['QB']['RB'] = st.number_input('QB - RB', min_value = -1.0, max_value = 1.0, value = st.session_state['correlation dict']['QB']['RB'])
+            with corr2:
+                st.session_state['correlation dict']['QB']['WR'] = st.number_input('QB - WR', min_value = -1.0, max_value = 1.0, value = st.session_state['correlation dict']['QB']['WR'])
+            with corr3:
+                st.session_state['correlation dict']['QB']['TE'] = st.number_input('QB - TE', min_value = -1.0, max_value = 1.0, value = st.session_state['correlation dict']['QB']['TE'])
+            with corr4:
+                st.session_state['correlation dict']['QB']['Opp_QB'] = st.number_input('QB - Opposing QB', min_value = -1.0, max_value = 1.0, value = st.session_state['correlation dict']['QB']['Opp_QB'])
+            reset_correlations = st.button('Reset')
+            if reset_correlations:
+                st.session_state['correlation dict'] = controller.get_default_correlations()
+                corr_df = controller.parse_correlation_to_df(st.session_state['correlation dict'])
+                st.table(corr_df.style.background_gradient())
+            else:
+                corr_df = controller.parse_correlation_to_df(st.session_state['correlation dict'])
+                st.table(corr_df.style.background_gradient())       
     
     #%%components and logic    
     with intro_container:
