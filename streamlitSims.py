@@ -13,7 +13,7 @@ pd.options.mode.chained_assignment = None
 
 class nfl():
     
-    def __init__():
+    def __init__(self):
         return
     
     @staticmethod 
