@@ -36,7 +36,7 @@ if 'sport_class' not in st.session_state:
     st.session_state['sport_class'] = None
 
 #set global constants
-has_valid_data = controller.data_checker(st.session_state['input data'])
+has_valid_data = controller.data_checker(st.session_state['input data'],st.session_state['sport'])
 
 #%%app layout and logic
 #initial tab layout and title
