@@ -29,19 +29,19 @@ if 'sim count' not in st.session_state:
     st.session_state['sim count'] = 1
 st.session_state.key = 'correlation dict'
 if 'correlation dict' not in st.session_state:
-    st.session_state['correlation dict'] = {'QB':{'WR':.66,'TE':.33,'RB':.08, 'Opp_QB':.24}}
+    st.session_state['correlation dict'] = {}
 if 'sport' not in st.session_state:
     st.session_state['sport'] = ''
 if 'sport_class' not in st.session_state:
     st.session_state['sport_class'] = None
 
 #set global constants
-has_valid_data = controller.data_checker(st.session_state['input data'],st.session_state['sport'])
+has_valid_data = controller.data_checker(st.session_state['input data'])
 
 #%%app layout and logic
 #initial tab layout and title
 st.title('RosterTech')
-st.session_state['sport'] = st.selectbox('Select Sport', ['','NFL', 'MLB'])
+st.session_state['sport'] = st.selectbox('Select Sport', ['','NFL', 'MLB'],st.session_state['sport'])
 
 
 if st.session_state['sport'] != '':
@@ -50,8 +50,10 @@ if st.session_state['sport'] != '':
     #start appropriate class
     if st.session_state['sport'] == 'NFL':
         sport_class = sims.nfl()
+        st.session_state['correlation dict'] = {'QB':{'WR':.66,'TE':.33,'RB':.08, 'Opp_QB':.24}}
     elif st.session_state['sport'] == 'MLB':
         sport_class = sims.mlb()
+        st.session_state['correlation dict'] = {'SP':{}}
     
     #write documentation
     with intro_tab:
@@ -71,12 +73,12 @@ if st.session_state['sport'] != '':
     
     if sample_button:
         st.session_state['input data'] = sample_data
-        has_valid_data = controller.data_checker(st.session_state['input data'],st.session_state['sport'])
+        has_valid_data = controller.data_checker(st.session_state['input data'], st.session_state['sport'])
     
     if dat is not None:
         df = pd.read_csv(dat)
         st.session_state['input data'] = df   
-        has_valid_data = controller.data_checker(st.session_state['input data'],st.session_state['sport'])
+        has_valid_data = controller.data_checker(st.session_state['input data'], st.session_state['sport'])
     
     #if valid data exists
     if has_valid_data:
