@@ -41,7 +41,7 @@ has_valid_data = controller.data_checker(st.session_state['input data'],st.sessi
 #%%app layout and logic
 #initial tab layout and title
 st.title('RosterTech')
-st.session_state['sport'] = st.selectbox('Select Sport', ['','NFL', 'MLB'],st.session_state['sport'])
+st.session_state['sport'] = st.selectbox('Select Sport', ['','NFL', 'MLB'])
 
 
 if st.session_state['sport'] != '':
