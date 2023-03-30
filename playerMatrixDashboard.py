@@ -71,7 +71,7 @@ if st.session_state['sport'] != '':
     
     if sample_button:
         st.session_state['input data'] = sample_data
-        has_valid_data = controller.data_checker(st.session_state['input data'])
+        has_valid_data = controller.data_checker(st.session_state['input data'],st.session_state['sport'])
     
     if dat is not None:
         df = pd.read_csv(dat)
