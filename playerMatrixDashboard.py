@@ -31,7 +31,7 @@ st.session_state.key = 'correlation dict'
 if 'correlation dict' not in st.session_state:
     st.session_state['correlation dict'] = {'QB':{'WR':.66,'TE':.33,'RB':.08, 'Opp_QB':.24}}
 if 'sport' not in st.session_state:
-    st.session_state['sport'] = None
+    st.session_state['sport'] = ''
 if 'sport_class' not in st.session_state:
     st.session_state['sport_class'] = None
 
@@ -41,11 +41,12 @@ has_valid_data = controller.data_checker(st.session_state['input data'])
 #%%app layout and logic
 #initial tab layout and title
 st.title('RosterTech')
-intro_tab, data_tab, sims_tab, relationships_tab, correlations_tab = st.tabs(['What is this?','Import Projections','Run Sims', 'Explore Relationships', 'Edit Correlations'])
+st.session_state['sport'] = st.selectbox('Select Sport', ['','NFL', 'MLB'])
 
-st.session_state['sport'] = st.selectbox('Select Sport', ['NFL', 'MLB'])
 
-if st.session_state['sport'] != None:
+if st.session_state['sport'] != '':
+    intro_tab, data_tab, sims_tab, relationships_tab, correlations_tab = st.tabs(['What is this?','Import Projections','Run Sims', 'Explore Relationships', 'Edit Correlations'])
+    
     #start appropriate class
     if st.session_state['sport'] == 'NFL':
         sport_class = sims.nfl()
@@ -95,7 +96,7 @@ if st.session_state['sport'] != None:
                 ownership_col = 'Ownership'
             else:
                 ownership_col = None
-            #TODO: make dynamic
+                
             sims_results,lineups = sport_class.standard_sims(st.session_state['input data'], count,correlation_values = st.session_state['correlation dict'], fpts_col_name='Fpts', ceil_column = 'Ceil', floor_column = 'Floor',ownership_column=ownership_col, status_bar=status_bar)
             status_bar.empty()
             st.session_state['sim results'] = sims_results
@@ -175,4 +176,4 @@ if st.session_state['sport'] != None:
                      ''')
                      
         
-  
+    
