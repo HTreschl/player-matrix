@@ -88,7 +88,9 @@ if st.session_state['sport'] != '':
         with data_tab:
             st.subheader('Imported Data')
             st.session_state['included_teams'] = st.multiselect('Teams To Include',team_options, default = st.session_state['included_teams']) 
-            st.session_state['input data'] = st.session_state['input data'][st.session_state['input data']['Team'] in st.session_state['included_teams']]
+            df = st.session_state['input data']
+            df = df[df['Team'].isin(st.session_state['included_teams'])]
+            st.session_state['input data'] = df
             st.dataframe(st.session_state['input data'])
         
         #sims tab
