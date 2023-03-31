@@ -34,6 +34,8 @@ if 'sport' not in st.session_state:
     st.session_state['sport'] = ''
 if 'sport_class' not in st.session_state:
     st.session_state['sport_class'] = None
+if 'included_teams' not in st.session_state:
+    st.session_state['included_teams'] = []
 
 #set global constants
 has_valid_data = controller.data_checker(st.session_state['input data'],st.session_state['sport'])
@@ -79,11 +81,14 @@ if st.session_state['sport'] != '':
         df = pd.read_csv(dat)
         st.session_state['input data'] = df   
         has_valid_data = controller.data_checker(st.session_state['input data'], st.session_state['sport'])
-    
+        team_options = set(df['Team'])
+        
     #if valid data exists
     if has_valid_data:
         with data_tab:
             st.subheader('Imported Data')
+            st.session_state['included_teams'] = st.multiselect('Teams To Include',team_options, default = st.session_state['included_teams']) 
+            st.session_state['input data'] = st.session_state['input data'][st.session_state['input data']['Team'] in st.session_state['included_teams']]
             st.dataframe(st.session_state['input data'])
         
         #sims tab
