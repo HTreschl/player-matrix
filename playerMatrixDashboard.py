@@ -139,7 +139,7 @@ if st.session_state['sport'] == 'MLB':
             stack_feature = st.selectbox('Stack Feature', ['Optimal Ownership','Leverage'])
             stacks_button = st.button('Get Stacks')
             if stacks_button:
-                st.session_state['stack_data'] = controller.get_stacks(st.session_state['sim results'], stack_size)
+                st.session_state['stack_data'] = controller.get_stacks(st.session_state['sim results'], stack_size, stack_feature)
             st.dataframe(st.session_state['stack_data'])
                 
     else: #no valid data
@@ -286,4 +286,4 @@ if st.session_state['sport'] == 'NFL':
                      ''')
                      
         
-  
+    
