@@ -16,6 +16,17 @@ def lineup_parser(lineups, crit):
     counts = pd.DataFrame(counts).rename(columns = {'Name':'Count'}).reset_index().sort_values(by = 'Count', ascending=False)
     return counts
 
+
+def get_stacks(df, stack, by_col = 'Optimal Ownership'):
+    '''given a dataframe of results from sims.mlb.standard sims, returns the most optimal stacks given a stack size'''
+    df = df[df['Position']!='SP']  
+    prim_df = df.groupby('Team').apply(lambda x: x.sort_values(by = by_col,ascending=False).head(stack)).drop(columns = ['Team']).reset_index()
+    top_teams = prim_df.groupby('Team')[by_col].sum().reset_index().sort_values(by = by_col, ascending=False)
+    res = top_teams.merge(prim_df, how = 'left', on = 'Team').drop(columns = ['{}_x'.format(by_col)]).rename(columns = {'{}_y'.format(by_col):by_col})
+    return res
+    
+    
+
 @st.cache
 def data_checker(df, sport):
     '''checks if the current supplied data is valid'''
