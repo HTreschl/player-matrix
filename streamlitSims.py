@@ -157,7 +157,7 @@ class mlb():
            opp_team_result = df.loc[df['Opp']==t, 'team_result'].reset_index().at[0, 'team_result']
            p_sl = df[(df['Team']==t)&(df['Position'] == 'SP')]
            h_sl = df[(df['Team']==t)&(df['Position'] != 'SP')]
-           p_sl['pitcher_result'] = 1 + (1-.33*opp_team_result)
+           p_sl['pitcher_result'] = 1-(.33*opp_team_result)
            p_sl['results'] = [np.random.normal(pr, 1) for pr in p_sl['pitcher_result']]
            h_sl['results'] = [np.random.normal(hr, 1) for hr in h_sl['team_result']]
            slices.append(p_sl)
@@ -206,7 +206,7 @@ class mlb():
         
         for i in range(count):
             df['Observed Fpts'] = self.scramble_projections(df, fpts_col_name,correlation_values, ceil_column, floor_column)
-            lineup = optimizer.standard_optimizer(df, objective_fn_column='Observed Fpts')
+            lineup = optimizer.standard_optimizer(df, objective_fn_column='Observed Fpts', )
             lineup_list.append(set(lineup))
             if status_bar:
                 status_bar.progress(i/count)
