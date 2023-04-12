@@ -206,7 +206,7 @@ class mlb():
         
         for i in range(count):
             df['Observed Fpts'] = self.scramble_projections(df, fpts_col_name,correlation_values, ceil_column, floor_column)
-            lineup = optimizer.standard_optimizer(df, objective_fn_column='Observed Fpts', )
+            lineup = optimizer.standard_optimizer(df, objective_fn_column='Observed Fpts')
             lineup_list.append(set(lineup))
             if status_bar:
                 status_bar.progress(i/count)
@@ -232,3 +232,13 @@ class mlb():
         df = df.sort_values(by = ['Position','Optimal Ownership'], ascending = False).set_index('Name')
         df = df[df['Optimal Ownership'].isnull()==False]
         return df, lineup_list
+
+
+
+
+
+
+
+
+
+
