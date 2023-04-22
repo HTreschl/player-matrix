@@ -8,6 +8,7 @@ Created on Fri Nov 26 14:39:25 2021
 import Optimizer as opt
 import pandas as pd
 import numpy as np
+import concurrent.futures
 pd.options.mode.chained_assignment = None
 
 
@@ -190,6 +191,11 @@ class mlb():
        return observed_results        
         
         
+    def scramble_and_optimize(self,args):
+        df, fpts_col_name,correlation_values,ceil_column,floor_column,objective_fn_column = args 
+        df['Observed Fpts'] = self.scramble_projections(df, fpts_col_name,correlation_values, ceil_column, floor_column)
+        lineup = opt.MLB(df).standard_optimizer(df, objective_fn_column='Observed Fpts')
+        return lineup
     
     def standard_sims(self, df, count,correlation_values = {}, fpts_col_name='Fpts', ceil_column=None, floor_column=None,ownership_column = None,status_bar=None):
         '''
@@ -202,6 +208,9 @@ class mlb():
         optimizer = opt.MLB(df)
         df = optimizer.prep_df()
         
+        
+        '''
+        start = time.time()
         lineup_list = []
         
         for i in range(count):
@@ -210,8 +219,12 @@ class mlb():
             lineup_list.append(set(lineup))
             if status_bar:
                 status_bar.progress(i/count)
-            
-    
+        print(time.time() - start)
+        '''    
+        inputs = [(df, fpts_col_name,correlation_values,ceil_column,floor_column,'Observed Fpts')] * count
+        with concurrent.futures.ThreadPoolExecutor(max_workers = 3) as e:
+            lineup_list = list(e.map(self.scramble_and_optimize,inputs))
+        
         player_list = []
         for lineup in lineup_list:
             for player in lineup:
