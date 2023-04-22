@@ -234,9 +234,8 @@ class mlb():
         counts = pd.DataFrame(counts).rename(columns = {0 : 'Count'}).reset_index()
         
         df = df.merge(counts, how='left', on='Name')
-        return df, lineup_list
         #calculations
-        df['Optimal Ownership'] = (df['Count']/count)*100
+        df['Optimal Ownership'] = (df['count']/count)*100
         include_columns = ['Name','Position','Team','Opp','Salary','Optimal Ownership', fpts_col_name]
         if ownership_column is not None:
             df['Leverage'] = df['Optimal Ownership'] - df[ownership_column] 
