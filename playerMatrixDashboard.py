@@ -126,6 +126,7 @@ if st.session_state['sport'] == 'MLB':
             if len(selected_players) > 0:
                 st.subheader('Optimal Pairings for {}'.format(', '.join(selected_players)))
                 filtered_players = controller.lineup_parser(st.session_state['lineups'], selected_players)
+                st.dataframe(filtered_players)
                 tot_matching_lineups = list(filtered_players.loc[filtered_players['Name']==list(selected_players)[0], ['Count']]['Count'])[0]
                 filtered_players = filtered_players[filtered_players['Name'].isin(selected_players)==False]
                 filtered_players['% of Filtered Lineups'] = (filtered_players['Count']/tot_matching_lineups)*100
