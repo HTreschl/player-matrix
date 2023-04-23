@@ -49,7 +49,7 @@ st.session_state['sport'] = st.selectbox('Select Sport', ['','NFL', 'MLB'])
 
 #%%MLB
 if st.session_state['sport'] == 'MLB':
-    intro_tab, data_tab, sims_tab, relationships_tab, stacks_tab = st.tabs(['What is this?','Import Projections','Run Sims', 'Explore Relationships', 'Stacks'])
+    intro_tab, data_tab, sims_tab, relationships_tab, stacks_tab,lineups_tab = st.tabs(['What is this?','Import Projections','Run Sims', 'Explore Relationships', 'Stacks','lineups'])
     
     #start appropriate class
     sport_class = sims.mlb()
@@ -107,7 +107,7 @@ if st.session_state['sport'] == 'MLB':
             sims_results,lineups = sport_class.standard_sims(st.session_state['input data'], count,correlation_values = st.session_state['correlation dict'], fpts_col_name='Fpts', ceil_column = 'Ceil', floor_column = 'Floor',ownership_column=ownership_col, status_bar=status_bar)
             status_bar.empty()
             st.session_state['sim results'] = sims_results
-            st.session_state['lineups'] = lineups
+            st.session_state['lineups'] = [x[0] for x in lineups]
             st.session_state['sim count'] = count
             with sims_tab:
                 st.subheader('Sims Results')
