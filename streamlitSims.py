@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-Created on Fri Nov 26 14:39:25 2021
+Created on Sun Apr 23 09:50:37 2023
 
 @author: hunte
 """
-
 import Optimizer as opt
 import pandas as pd
 import numpy as np
@@ -12,73 +11,22 @@ import concurrent.futures
 pd.options.mode.chained_assignment = None
 
 
-class nfl():
+class sims():
     
     def __init__(self):
         return
     
-    @staticmethod 
-    def scramble_projections(df, fpts_column,correlation_values = None, ceil_column=None, floor_column=None):
-        '''
-        returns a formatted dataframe of scrambled fpts results for players in a dataframe
+    def scramble_projections(df, fpts_column,ceil_column=None, floor_column=None):
+        return
         
-        correlations passed as nested dict; nulls should be passed as 0's'
         
-        TO: add correlation for opponents
-        '''
-        #store variables
-        qb_correlated_positions = list(correlation_values['QB'].keys())
-        #prep work, fill nulls
-        if ceil_column:
-            df[ceil_column] = df[ceil_column].fillna(df[fpts_column]*2)
-        if floor_column:
-            df[floor_column] = df[floor_column].fillna(df[fpts_column]/2)
-            
-        fpts_values = list(df[fpts_column]) #predicted fpts values
-        slice_list = [] #placeholder for df slices
-        
-        #get QB results
-        qbs = df[df['Pos']=='QB']
-        qbs['results'] = [np.random.normal(1,1) for i in range(len(qbs))]
-        slice_list.append(qbs)
-        
-        #get other results -- same team
-        for team in qbs['Team']:
-            team_qb_result = qbs.loc[qbs['Team']==team, 'results'].reset_index().at[0, 'results'] #the value for that teams' QB; use as base for the other slices
-            opponent_qb_result = qbs.loc[qbs['Opp']==team, 'results'].reset_index().at[0, 'results']
-            net_qb_result = team_qb_result + (opponent_qb_result*correlation_values['QB']['Opp_QB'])
-            for pos in qb_correlated_positions:
-                pos_sl = df[(df['Pos'] == pos) & (df['Team'] == team)]
-                pos_sl['results'] = [np.random.normal(net_qb_result*correlation_values['QB'][pos],1) for i in range(len(pos_sl))]
-                slice_list.append(pos_sl)
-        correlated_results = pd.concat(slice_list)[['results']]
-        tmp = df.merge(correlated_results, how = 'left', left_index=True, right_index = True)
-        tmp = tmp.drop_duplicates(subset = ['Name','Team',fpts_column])
-        #fill the empties with simple random values
-        tmp['results'] = [np.random.normal(1,1) if np.isnan(x) else x for x in tmp['results']]
-        res = list(tmp['results'])
+    def scramble_and_optimize(self,args):
+        df, fpts_col_name,ceil_column,floor_column,objective_fn_column = args 
+        df['Observed Fpts'] = self.scramble_projections(df, fpts_col_name, ceil_column, floor_column)
+        lineup = opt.MLB(df).standard_optimizer(df, objective_fn_column='Observed Fpts')
+        return lineup
     
-        #generate fpts values
-        observed_results = []
-        if ceil_column and floor_column: #ceiling and floor supplied
-            ceil_column = list(df[ceil_column])
-            floor_column = list(df[floor_column])
-            results_arr = np.array((fpts_values, ceil_column, floor_column, res))
-            for i in range(results_arr.shape[1]):
-                mean_dist = results_arr[3,i]-1
-                if mean_dist < 0:
-                    floor_dist = results_arr[0,i] - results_arr[2,i]
-                    r = results_arr[0,i] - (floor_dist*abs(mean_dist))
-                    observed_results.append(r)
-                else:
-                    ceil_dist = results_arr[1,i] - results_arr[0,i]
-                    r = results_arr[0,i] + (ceil_dist*mean_dist)
-                    observed_results.append(r)
-        else: #no ceiling and floor
-            observed_results = [res[i]*fpts_values[i] for i in range(len(fpts_values))]
-        return observed_results
-    
-    def standard_sims(self, df, count,correlation_values = {'QB':{'WR':.66, 'TE':.33, 'Opp_QB':0.0}}, fpts_col_name='Fpts', ceil_column=None, floor_column=None,ownership_column = None,status_bar=None):
+    def standard_sims(self, df, count, fpts_col_name='Fpts', ceil_column=None, floor_column=None,ownership_column = None,status_bar=None):
         '''
         returns a datarame of optimal rates as well as an array of simulated winning lineups
         
@@ -86,50 +34,54 @@ class nfl():
         '''
         
         df = df.drop_duplicates(subset = ['Name','Team',fpts_col_name])
+        df = self.optimizer.prep_df()
+          
+        inputs = [(df, fpts_col_name,ceil_column,floor_column,'Observed Fpts')] * count
+        with concurrent.futures.ThreadPoolExecutor(max_workers = 3) as e:
+            lineup_list = list(e.map(self.scramble_and_optimize,inputs))
         
-        model = opt.NFL(df)
-        optimizer = model.standard_optimizer
-        
-            
-        lineup_list = []
-        
-        for i in range(count):
-            df['Observed Fpts'] = self.scramble_projections(df, fpts_col_name,correlation_values, ceil_column, floor_column)
-            lineup = optimizer(df, objective_fn_column='Observed Fpts')
-            lineup_list.append(set(lineup))
-            if status_bar:
-                status_bar.progress(i/count)
-            
-    
         player_list = []
         for lineup in lineup_list:
             for player in lineup:
                 player_list.append(player)
                 
         counts = pd.DataFrame(player_list).rename(columns = {0 : 'Name'}).value_counts()
-        counts = pd.DataFrame(counts).rename(columns = {0 : 'Count'}).reset_index()
+        counts = pd.DataFrame(counts).rename(columns = {0 : 'count'}).reset_index()
         
         df = df.merge(counts, how='left', on='Name')
         #calculations
-        df['Optimal Ownership'] = (df['Count']/count)*100
-        include_columns = ['Name','Pos','Team','Opp','Salary','Optimal Ownership', fpts_col_name]
+        df['Optimal Ownership'] = (df['count']/count)*100
+        include_columns = ['Name','Position','Team','Opp','Salary','Optimal Ownership', fpts_col_name]
         if ownership_column is not None:
             df['Leverage'] = df['Optimal Ownership'] - df[ownership_column] 
             include_columns += [ownership_column, 'Leverage']
         #filter and sort
         df = df[include_columns]
-        df = df.sort_values(by = ['Pos','Optimal Ownership'], ascending = False).set_index('Name')
+        df = df.sort_values(by = ['Position','Optimal Ownership'], ascending = False).set_index('Name')
         df = df[df['Optimal Ownership'].isnull()==False]
-        return df, lineup_list
+        
+        #get lineup total scores
+        scores = [self.get_total_lineup_score(lineup, fpts_col_name) for lineup in lineup_list]
+        lineups = list(zip(lineup_list,scores))
+        
+        
+        return df, lineups
     
-class mlb():
+    def get_total_lineup_score(self, lineup, fpts_col_name):
+        d = pd.DataFrame(lineup, columns = ['Name'])
+        df = d.merge(self.df, how = 'left', on = 'Name')
+        score = df[fpts_col_name].sum()
+        return score
     
-    def __init__(self):
+class mlb(sims):
+    
+    def __init__(self, df):
+        self.correlation_values = {'SP':{}}
+        self.optimizer = opt.MLB(df)
+        self.df = df
         return
-    
-    
-    @staticmethod
-    def scramble_projections(df, fpts_column,correlation_values = {'SP':{}}, ceil_column=None, floor_column=None):
+ 
+    def scramble_projections(self, df, fpts_column, ceil_column=None, floor_column=None):
        '''
        returns a formatted dataframe of scrambled fpts results for players in a dataframe
        
@@ -137,7 +89,7 @@ class mlb():
        
        TO: add correlation for opponents
        '''
-
+       
        #prep work, fill nulls
        if ceil_column:
            df[ceil_column] = df[ceil_column].fillna(df[fpts_column]*2)
@@ -169,7 +121,7 @@ class mlb():
        #fill the empties with simple random values
        tmp['results'] = [np.random.normal(1,1) if np.isnan(x) else x for x in tmp['results']]
        res = list(tmp['results'])
-   
+       
        #generate fpts values
        observed_results = []
        if ceil_column and floor_column: #ceiling and floor supplied
@@ -188,70 +140,72 @@ class mlb():
                    observed_results.append(r)
        else: #no ceiling and floor
            observed_results = [res[i]*fpts_values[i] for i in range(len(fpts_values))]
-       return observed_results        
-        
-        
-    def scramble_and_optimize(self,args):
-        df, fpts_col_name,correlation_values,ceil_column,floor_column,objective_fn_column = args 
-        df['Observed Fpts'] = self.scramble_projections(df, fpts_col_name,correlation_values, ceil_column, floor_column)
-        lineup = opt.MLB(df).standard_optimizer(df, objective_fn_column='Observed Fpts')
-        return lineup
+       return observed_results   
+
+class nfl(sims):
+
+    def __init__(self, df): 
+        self.correlation_values = {'QB':{'WR':.66, 'TE':.33, 'Opp_QB':0.0}}
+        self.optimizer = opt.NFL(df)
+        self.df = df
+        return
     
-    def standard_sims(self, df, count,correlation_values = {}, fpts_col_name='Fpts', ceil_column=None, floor_column=None,ownership_column = None,status_bar=None):
+    def scramble_projections(self, df, fpts_column, ceil_column=None, floor_column=None):
         '''
-        returns a datarame of optimal rates as well as an array of simulated winning lineups
+        returns a formatted dataframe of scrambled fpts results for players in a dataframe
         
-        input a df of projections and a model object from the optimizer class
+        correlations passed as nested dict; nulls should be passed as 0's'
+        
+        TO: add correlation for opponents
         '''
+        #store variables
+        qb_correlated_positions = list(self.correlation_values['QB'].keys())
+        #prep work, fill nulls
+        if ceil_column:
+            df[ceil_column] = df[ceil_column].fillna(df[fpts_column]*2)
+        if floor_column:
+            df[floor_column] = df[floor_column].fillna(df[fpts_column]/2)
+            
+        fpts_values = list(df[fpts_column]) #predicted fpts values
+        slice_list = [] #placeholder for df slices
         
-        df = df.drop_duplicates(subset = ['Name','Team',fpts_col_name])
-        optimizer = opt.MLB(df)
-        df = optimizer.prep_df()
+        #get QB results
+        qbs = df[df['Pos']=='QB']
+        qbs['results'] = [np.random.normal(1,1) for i in range(len(qbs))]
+        slice_list.append(qbs)
         
-        
-        '''
-        start = time.time()
-        lineup_list = []
-        
-        for i in range(count):
-            df['Observed Fpts'] = self.scramble_projections(df, fpts_col_name,correlation_values, ceil_column, floor_column)
-            lineup = optimizer.standard_optimizer(df, objective_fn_column='Observed Fpts')
-            lineup_list.append(set(lineup))
-            if status_bar:
-                status_bar.progress(i/count)
-        print(time.time() - start)
-        '''    
-        inputs = [(df, fpts_col_name,correlation_values,ceil_column,floor_column,'Observed Fpts')] * count
-        with concurrent.futures.ThreadPoolExecutor(max_workers = 3) as e:
-            lineup_list = list(e.map(self.scramble_and_optimize,inputs))
-        
-        player_list = []
-        for lineup in lineup_list:
-            for player in lineup:
-                player_list.append(player)
-                
-        counts = pd.DataFrame(player_list).rename(columns = {0 : 'Name'}).value_counts()
-        counts = pd.DataFrame(counts).rename(columns = {0 : 'Count'}).reset_index()
-        
-        df = df.merge(counts, how='left', on='Name')
-        #calculations
-        df['Optimal Ownership'] = (df['count']/count)*100
-        include_columns = ['Name','Position','Team','Opp','Salary','Optimal Ownership', fpts_col_name]
-        if ownership_column is not None:
-            df['Leverage'] = df['Optimal Ownership'] - df[ownership_column] 
-            include_columns += [ownership_column, 'Leverage']
-        #filter and sort
-        df = df[include_columns]
-        df = df.sort_values(by = ['Position','Optimal Ownership'], ascending = False).set_index('Name')
-        df = df[df['Optimal Ownership'].isnull()==False]
-        return df, lineup_list
-
-
-
-
-
-
-
-
-
-
+        #get other results -- same team
+        for team in qbs['Team']:
+            team_qb_result = qbs.loc[qbs['Team']==team, 'results'].reset_index().at[0, 'results'] #the value for that teams' QB; use as base for the other slices
+            opponent_qb_result = qbs.loc[qbs['Opp']==team, 'results'].reset_index().at[0, 'results']
+            net_qb_result = team_qb_result + (opponent_qb_result*self.correlation_values['QB']['Opp_QB'])
+            for pos in qb_correlated_positions:
+                pos_sl = df[(df['Pos'] == pos) & (df['Team'] == team)]
+                pos_sl['results'] = [np.random.normal(net_qb_result*self.correlation_values['QB'][pos],1) for i in range(len(pos_sl))]
+                slice_list.append(pos_sl)
+        correlated_results = pd.concat(slice_list)[['results']]
+        tmp = df.merge(correlated_results, how = 'left', left_index=True, right_index = True)
+        tmp = tmp.drop_duplicates(subset = ['Name','Team',fpts_column])
+        #fill the empties with simple random values
+        tmp['results'] = [np.random.normal(1,1) if np.isnan(x) else x for x in tmp['results']]
+        res = list(tmp['results'])
+    
+        #generate fpts values
+        observed_results = []
+        if ceil_column and floor_column: #ceiling and floor supplied
+            ceil_column = list(df[ceil_column])
+            floor_column = list(df[floor_column])
+            results_arr = np.array((fpts_values, ceil_column, floor_column, res))
+            for i in range(results_arr.shape[1]):
+                mean_dist = results_arr[3,i]-1
+                if mean_dist < 0:
+                    floor_dist = results_arr[0,i] - results_arr[2,i]
+                    r = results_arr[0,i] - (floor_dist*abs(mean_dist))
+                    observed_results.append(r)
+                else:
+                    ceil_dist = results_arr[1,i] - results_arr[0,i]
+                    r = results_arr[0,i] + (ceil_dist*mean_dist)
+                    observed_results.append(r)
+        else: #no ceiling and floor
+            observed_results = [res[i]*fpts_values[i] for i in range(len(fpts_values))]
+        return observed_results   
