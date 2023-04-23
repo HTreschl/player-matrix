@@ -51,10 +51,6 @@ st.session_state['sport'] = st.selectbox('Select Sport', ['','NFL', 'MLB'])
 if st.session_state['sport'] == 'MLB':
     intro_tab, data_tab, sims_tab, relationships_tab, stacks_tab,lineups_tab = st.tabs(['What is this?','Import Projections','Run Sims', 'Explore Relationships', 'Stacks','lineups'])
     
-    #start appropriate class
-    sport_class = sims.mlb()
-    st.session_state['correlation dict'] = {'SP':{}}
-    
     #write documentation
     with intro_tab:
         intro_container = st.container()
@@ -83,6 +79,9 @@ if st.session_state['sport'] == 'MLB':
         
     #if valid data exists
     if has_valid_data:
+        #start appropriate class
+        sport_class = sims.mlb(st.session_state['input data'])
+        
         with data_tab:
             st.subheader('Imported Data')
             #st.session_state['included_teams'] = st.multiselect('Teams To Include',team_options, default = st.session_state['included_teams']) 
