@@ -37,7 +37,7 @@ class sims():
         df = self.optimizer.prep_df()
           
         inputs = [(df, fpts_col_name,ceil_column,floor_column,'Observed Fpts')] * count
-        with concurrent.futures.ThreadPoolExecutor(max_workers = 3) as e:
+        with concurrent.futures.ThreadPoolExecutor(max_workers = 1) as e:
             lineup_list = list(e.map(self.scramble_and_optimize,inputs))
         
         player_list = []
