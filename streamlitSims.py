@@ -37,7 +37,7 @@ class sims():
         df = self.optimizer.prep_df()
           
         inputs = [(df, fpts_col_name,ceil_column,floor_column,'Observed Fpts')] * count
-        with concurrent.futures.ThreadPoolExecutor(max_workers = 1) as e:
+        with concurrent.futures.ThreadPoolExecutor(max_workers = 3) as e:
             lineup_list = list(e.map(self.scramble_and_optimize,inputs))
         
         player_list = []
@@ -107,7 +107,10 @@ class mlb(sims):
        #bias down opposing pitchers and get the individual results
        slices = []
        for t in teams:
-           opp_team_result = df.loc[df['Opp']==t, 'team_result'].reset_index().at[0, 'team_result']
+           try:
+               opp_team_result = df.loc[df['Opp']==t, 'team_result'].reset_index().at[0, 'team_result']
+           except KeyError:
+               opp_team_result = 0
            p_sl = df[(df['Team']==t)&(df['Position'] == 'SP')]
            h_sl = df[(df['Team']==t)&(df['Position'] != 'SP')]
            p_sl['pitcher_result'] = 1-(.33*opp_team_result)
