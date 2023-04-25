@@ -135,7 +135,7 @@ if st.session_state['sport'] == 'MLB':
                 
         with stacks_tab:
             stack_size = st.slider('Stack Size', min_value = 1, max_value = 6, step = 1)
-            stack_feature = st.selectbox('Stack Feature', ['Optimal Ownership','Leverage'])
+            stack_feature = st.selectbox('Stack Feature', ['Optimal Ownership','Leverage','Efficiency','Fpts'])
             stacks_button = st.button('Get Stacks')
             if stacks_button:
                 st.session_state['stack_data'] = controller.get_stacks(st.session_state['sim results'], stack_size, stack_feature)
