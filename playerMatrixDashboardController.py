@@ -69,3 +69,20 @@ def get_baseline_optimal(df):
     result = opt.NFL(df).standard_optimizer(df, objective_fn_column='Fpts')
     res_df = df[df['Name'].isin(result)]
     return res_df
+
+@st.cache
+def parse_lineups(lineups_list):
+    '''given a lieups list from the mlb sims, returns a dataframe of the top projected lineups and their characteristics'''
+    df = pd.DataFrame(lineups_list, columns = ['Player','Lineup Score'])
+    df = df.explode('Player')
+    df['Name'] = [x[0] for x in df['Player']]
+    df['Position'] = [x[1] for x in df['Player']]
+    df['Team'] = [x[2] for x in df['Player']]
+    df = df.drop(columns = ['Player'])
+    #calculate stack params
+    hitters = df[df['Position']!= 'SP']
+    groups = hitters.groupby([hitters.index,'Team'])['Position'].count().reset_index()
+    groups = groups.groupby('level_0').apply(lambda x: dict(zip(x['Team'],x['Position'])))
+    groups.name= 'G' #set the name to merge
+    df = df.merge(groups, how = 'left', left_index=True, right_index = True)
+    return df
