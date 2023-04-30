@@ -65,7 +65,7 @@ class MLB():
         return df
     
     
-    def standard_optimizer(self, df, objective_fn_column, params = {'stack': [], 'no_opps': False}):
+    def standard_optimizer(self, df, objective_fn_column, stack = False, no_opps = False, return_score = False):
         '''
         
         Parameters
@@ -84,11 +84,7 @@ class MLB():
         results : dataframe
             the players in the optimized lineup.
 
-        '''
-        #parse params
-        stack = params['stack']
-        no_opps = params['no_opps']
-        
+        '''        
         #final cleaning
         df = df[df[objective_fn_column].isnull()==False]
         
@@ -142,8 +138,12 @@ class MLB():
         
         #write to list of playernames
         sln_locs = [int(x.name.split('_')[1]) for x in prob.variables() if x.varValue == 1 and 'teams_' not in x.name]
-        slns = df.filter(items = sln_locs, axis = 0)[['Name','Position','Team']]
-        return slns.values.tolist()
+        slns = df.filter(items = sln_locs, axis = 0)
+        if return_score:
+            score = slns[objective_fn_column].sum()
+            return slns[['Name','Position','Team']].values.tolist(), score
+        else:
+            return slns[['Name','Position','Team']].values.tolist()
         
     
 class NFL():
@@ -282,5 +282,4 @@ class NFL():
         prob.solve(self.solver)
         slns = [x.name[8:].replace('_',' ') for x in prob.variables() if x.varValue == 1]
         return slns
-        
-    
+   
