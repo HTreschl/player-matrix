@@ -23,8 +23,8 @@ class sims():
     def scramble_and_optimize(self,args):
         df, fpts_col_name,ceil_column,floor_column,objective_fn_column = args 
         df['Observed Fpts'] = self.scramble_projections(df, fpts_col_name, ceil_column, floor_column)
-        lineup = opt.MLB(df).standard_optimizer(df, objective_fn_column='Observed Fpts')
-        return lineup
+        lineup,score = opt.MLB(df).standard_optimizer(df, objective_fn_column='Observed Fpts',return_score = True)
+        return lineup,score
     
     def standard_sims(self, df, count, fpts_col_name='Fpts', ceil_column=None, floor_column=None,ownership_column = None,status_bar=None):
         '''
@@ -39,6 +39,9 @@ class sims():
         inputs = [(df, fpts_col_name,ceil_column,floor_column,'Observed Fpts')] * count
         with concurrent.futures.ThreadPoolExecutor(max_workers = 3) as e:
             lineup_list = list(e.map(self.scramble_and_optimize,inputs))
+            
+        observed_scores = [x[1] for x in lineup_list]
+        lineup_list = [x[0] for x in lineup_list]
         
         player_list = []
         for lineup in lineup_list:
@@ -61,7 +64,9 @@ class sims():
         df = df[df['Optimal Ownership'].isnull()==False]
         
         #get lineup total scores
-        scores = [self.get_total_lineup_score(lineup, fpts_col_name) for lineup in lineup_list]
+        expected_scores = [self.get_total_lineup_score(lineup, fpts_col_name) for lineup in lineup_list]
+        #take the weighted average of the actual score and the expected score
+        scores = [((expected_scores[i]*2)+(observed_scores[i]))/3 for i in range(count)]
         lineups = list(zip(lineup_list,scores))
         
         return df, lineups
