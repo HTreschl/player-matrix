@@ -108,8 +108,7 @@ if st.session_state['sport'] == 'MLB':
             sims_results,lineups = sport_class.standard_sims(st.session_state['input data'], count, fpts_col_name='Fpts', ceil_column = 'Ceil', floor_column = 'Floor',ownership_column=ownership_col, status_bar=status_bar)
             status_bar.empty()
             st.session_state['sim results'] = sims_results
-            st.session_state['lineups'] = [x[0] for x in lineups]
-            st.session_state['scores'] = [x[1] for x in lineups]
+            st.session_state['lineups'] = lineups
             st.session_state['sim count'] = count
             with sims_tab:
                 st.subheader('Sims Results')
@@ -146,9 +145,8 @@ if st.session_state['sport'] == 'MLB':
             
         with lineups_tab:
             st.subheader('Top Sims Lineups')
-            ranked_lineups = pd.DataFrame({'Lineup':st.session_state['lineups'],'Score':st.session_state['scores']})
-            ranked_lineups = ranked_lineups.sort_values(by = ['Score'], ascending = False)
-            st.dataframe(ranked_lineups)
+            lineups = controller.parse_lineups(st.session_state['lineups'])
+            st.dataframe(lineups)
             
                 
     else: #no valid data
@@ -295,4 +293,4 @@ if st.session_state['sport'] == 'NFL':
                      ''')
                      
         
-  
+    
