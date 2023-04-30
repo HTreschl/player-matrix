@@ -83,6 +83,10 @@ def parse_lineups(lineups_list):
     hitters = df[df['Position']!= 'SP']
     groups = hitters.groupby([hitters.index,'Team'])['Position'].count().reset_index()
     groups = groups.groupby('level_0').apply(lambda x: dict(zip(x['Team'],x['Position'])))
-    groups.name= 'G' #set the name to merge
+    groups = groups.apply(lambda x: {k:v for k,v in sorted(x.items(), key=lambda y:y[1], reverse = True)})
+    groups.name= 'Stacks' #set the name to merge
     df = df.merge(groups, how = 'left', left_index=True, right_index = True)
+    #get max stack size
+    df['Max Size'] = [max(x.values()) for x in df['Stacks']]
+    df['Summary'] = [list(x.values()) for x in df['Stacks']]
     return df
