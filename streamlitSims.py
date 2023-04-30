@@ -45,10 +45,10 @@ class sims():
             for player in lineup:
                 player_list.append(player)
                 
-        counts = pd.DataFrame(player_list).rename(columns = {0 : 'Name'}).value_counts()
+        counts = pd.DataFrame(player_list, columns = ['Name','Position','Team']).value_counts()
         counts = pd.DataFrame(counts).rename(columns = {0 : 'count'}).reset_index()
         
-        df = df.merge(counts, how='left', on='Name')
+        df = df.merge(counts, how='left', on=['Name','Position','Team'])
         #calculations
         df['Optimal Ownership'] = (df['count']/count)*100
         include_columns = ['Name','Position','Team','Opp','Salary','Optimal Ownership','Efficiency', fpts_col_name]
@@ -64,12 +64,11 @@ class sims():
         scores = [self.get_total_lineup_score(lineup, fpts_col_name) for lineup in lineup_list]
         lineups = list(zip(lineup_list,scores))
         
-        
         return df, lineups
     
     def get_total_lineup_score(self, lineup, fpts_col_name):
-        d = pd.DataFrame(lineup, columns = ['Name'])
-        df = d.merge(self.df, how = 'left', on = 'Name')
+        d = pd.DataFrame(lineup, columns = ['Name','Position','Team'])
+        df = d.merge(self.df, how = 'left', on = ['Name','Position','Team'])
         score = df[fpts_col_name].sum()
         return score
     
