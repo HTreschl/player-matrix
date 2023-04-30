@@ -38,6 +38,8 @@ if 'included_teams' not in st.session_state:
     st.session_state['included_teams'] = []
 if 'stack_data' not in st.session_state:
     st.session_state['stack_data'] = pd.DataFrame()
+if 'scores' not in st.session_state:
+    st.session_state['scores'] = []
 
 #set global constants
 has_valid_data = controller.data_checker(st.session_state['input data'],st.session_state['sport'])
@@ -107,6 +109,7 @@ if st.session_state['sport'] == 'MLB':
             status_bar.empty()
             st.session_state['sim results'] = sims_results
             st.session_state['lineups'] = [x[0] for x in lineups]
+            st.session_state['scores'] = [x[1] for x in lineups]
             st.session_state['sim count'] = count
             with sims_tab:
                 st.subheader('Sims Results')
@@ -140,6 +143,13 @@ if st.session_state['sport'] == 'MLB':
             if stacks_button:
                 st.session_state['stack_data'] = controller.get_stacks(st.session_state['sim results'], stack_size, stack_feature)
             st.dataframe(st.session_state['stack_data'])
+            
+        with lineups_tab:
+            st.subheader('Top Sims Lineups')
+            ranked_lineups = pd.DataFrame({'Lineup':st.session_state['lineups'],'Score':st.session_state['scores']})
+            ranked_lineups = ranked_lineups.sort_values(by = ['Score'], ascending = False)
+            st.dataframe(ranked_lineups)
+            
                 
     else: #no valid data
         with data_tab:
@@ -285,4 +295,4 @@ if st.session_state['sport'] == 'NFL':
                      ''')
                      
         
-    
+  
