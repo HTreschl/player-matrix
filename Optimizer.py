@@ -58,11 +58,6 @@ class MLB():
         opp_dummies = pd.get_dummies(df['Opp'], prefix = 'o_')
         df = df.merge(opp_dummies, left_index=True, right_index = True)
         
-        '''
-        #create opponent dummies
-        o_dummies = pd.get_dummies(df['Opponent'], prefix='o')
-        df = df.merge(o_dummies, left_index=True, right_index=True)
-        '''
         
         #pitchers and hitters
         df['hitters'] = np.where(df['Position']!='P', 1, 0)
@@ -147,8 +142,8 @@ class MLB():
         
         #write to list of playernames
         sln_locs = [int(x.name.split('_')[1]) for x in prob.variables() if x.varValue == 1 and 'teams_' not in x.name]
-        names = [df['Name'][i] for i in sln_locs]
-        return names
+        slns = df.filter(items = sln_locs, axis = 0)[['Name','Position','Team']]
+        return slns.values.tolist()
         
     
 class NFL():
@@ -288,4 +283,4 @@ class NFL():
         slns = [x.name[8:].replace('_',' ') for x in prob.variables() if x.varValue == 1]
         return slns
         
-   
+    
