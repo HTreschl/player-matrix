@@ -80,7 +80,7 @@ class sims():
 class mlb(sims):
     
     def __init__(self, df):
-        self.correlation_values = {'SP':{}}
+        self.correlation_values = {'Hitter':.40, 'Pitcher':.30}
         self.optimizer = opt.MLB(df)
         self.df = df
         return
@@ -104,7 +104,7 @@ class mlb(sims):
        
        #get team hitter results, use as base for hitters
        teams = list(set(df['Team']))
-       team_result = [np.random.normal(1,.33) for t in teams]
+       team_result = [np.random.normal(1,.40) for t in teams]
        t_df = pd.DataFrame({'Team':teams, 'team_result':team_result})
        df = df.merge(t_df, how = 'left', on = 'Team')
        
@@ -118,8 +118,8 @@ class mlb(sims):
            p_sl = df[(df['Team']==t)&(df['Position'] == 'SP')]
            h_sl = df[(df['Team']==t)&(df['Position'] != 'SP')]
            p_sl['pitcher_result'] = 1-(.33*opp_team_result)
-           p_sl['results'] = [np.random.normal(pr, 1) for pr in p_sl['pitcher_result']]
-           h_sl['results'] = [np.random.normal(hr, 1) for hr in h_sl['team_result']]
+           p_sl['results'] = [np.random.normal(pr, .80) for pr in p_sl['pitcher_result']]
+           h_sl['results'] = [np.random.normal(hr, .70) for hr in h_sl['team_result']]
            slices.append(p_sl)
            slices.append(h_sl)
            
