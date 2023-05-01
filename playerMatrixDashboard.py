@@ -148,7 +148,7 @@ if st.session_state['sport'] == 'MLB':
             lineups = controller.parse_lineups(st.session_state['lineups'])
             count = int(st.number_input('Number of Lineups to Export'))
             stacks_to_include = st.multiselect('Stacks to Include', lineups['Summary'].drop_duplicates())
-            filtered_lineups = lineups[lineups['Summary'].isin(stacks_to_include)].sort_values(by = ['Lineup Score'], ascending=False).head(count)
+            filtered_lineups = lineups[lineups['Summary'].isin(stacks_to_include)].sort_values(by = ['Lineup Score'], ascending=False).head(count*10)
             st.dataframe(filtered_lineups)
                 
     else: #no valid data
