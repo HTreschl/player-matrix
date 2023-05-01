@@ -146,8 +146,10 @@ if st.session_state['sport'] == 'MLB':
         with lineups_tab:
             st.subheader('Top Sims Lineups')
             lineups = controller.parse_lineups(st.session_state['lineups'])
-            st.dataframe(lineups)
-            
+            count = int(st.number_input('Number of Lineups to Export'))
+            stacks_to_include = st.multiselect('Stacks to Include', list(set(lineups['Summary'])))
+            filtered_lineups = lineups[lineups['Sumary'].isin(stacks_to_include)].sort_values(by = ['Lineup Score'], ascending=False).head(count)
+            st.dataframe(filtered_lineups)
                 
     else: #no valid data
         with data_tab:
@@ -293,4 +295,4 @@ if st.session_state['sport'] == 'NFL':
                      ''')
                      
         
-  
+    
