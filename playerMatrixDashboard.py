@@ -146,10 +146,14 @@ if st.session_state['sport'] == 'MLB':
         with lineups_tab:
             st.subheader('Top Sims Lineups')
             lineups = controller.parse_lineups(st.session_state['lineups'])
-            count = int(st.number_input('Number of Lineups to Export'))
-            stacks_to_include = st.multiselect('Stacks to Include', lineups['Summary'].drop_duplicates())
+            col_1,col_2 = st.columns(2)
+            with col_1:
+                count = int(st.number_input('Number of Lineups to Export'))
+            with col_2:
+                stacks_to_include = st.multiselect('Stacks to Include', lineups['Summary'].drop_duplicates())
             filtered_lineups = lineups[lineups['Summary'].isin(stacks_to_include)].sort_values(by = ['Lineup Score'], ascending=False).head(count*10)
             st.dataframe(filtered_lineups)
+            st.download_button('Export lineups to DK', filtered_lineups.to_csv(index=False, encoding = 'utf-8'), file_name='DK Lineups.csv')
                 
     else: #no valid data
         with data_tab:
