@@ -153,7 +153,7 @@ if st.session_state['sport'] == 'MLB':
                 stacks_to_include = st.multiselect('Stacks to Include', lineups['Summary'].drop_duplicates())
             filtered_lineups = lineups[lineups['Summary'].isin(stacks_to_include)].sort_values(by = ['Lineup Score'], ascending=False).head(count*10)
             st.dataframe(filtered_lineups)
-            st.download_button('Export lineups to DK', filtered_lineups.to_csv(index=False, encoding = 'utf-8'), file_name='DK Lineups.csv')
+            st.download_button('Export lineups to DK', filtered_lineups.to_csv(encoding = 'utf-8'), file_name='DK Lineups.csv')
                 
     else: #no valid data
         with data_tab:
