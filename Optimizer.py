@@ -65,7 +65,7 @@ class MLB():
         return df
     
     
-    def standard_optimizer(self, df, objective_fn_column, stack = False, no_opps = False, return_score = False):
+    def standard_optimizer(self, df, objective_fn_column, stack = None, no_opps = False, return_score = False):
         '''
         
         Parameters
@@ -281,5 +281,5 @@ class NFL():
         
         prob.solve(self.solver)
         slns = [x.name[8:].replace('_',' ') for x in prob.variables() if x.varValue == 1]
-        return slns
-   
+        return slns  
+    
