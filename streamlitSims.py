@@ -21,9 +21,13 @@ class sims():
         
         
     def scramble_and_optimize(self,args):
-        df, fpts_col_name,ceil_column,floor_column,objective_fn_column,five_three = args 
+        df, fpts_col_name,ceil_column,floor_column,objective_fn_column,five_three = args
+        if five_three:
+            stack = (5,3)
+        else:
+            stack = None
         df['Observed Fpts'] = self.scramble_projections(df, fpts_col_name, ceil_column, floor_column)
-        lineup,score = opt.MLB(df).standard_optimizer(df, objective_fn_column='Observed Fpts',return_score = True,stack=five_three,no_opps=True)
+        lineup,score = opt.MLB(df).standard_optimizer(df, objective_fn_column='Observed Fpts',return_score = True,stack=stack,no_opps=True)
         return lineup,score
     
     def standard_sims(self, df, count, fpts_col_name='Fpts', ceil_column=None, floor_column=None,ownership_column = None,status_bar=None,five_three = False):
