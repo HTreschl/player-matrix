@@ -21,12 +21,12 @@ class sims():
         
         
     def scramble_and_optimize(self,args):
-        df, fpts_col_name,ceil_column,floor_column,objective_fn_column = args 
+        df, fpts_col_name,ceil_column,floor_column,objective_fn_column,five_three = args 
         df['Observed Fpts'] = self.scramble_projections(df, fpts_col_name, ceil_column, floor_column)
-        lineup,score = opt.MLB(df).standard_optimizer(df, objective_fn_column='Observed Fpts',return_score = True)
+        lineup,score = opt.MLB(df).standard_optimizer(df, objective_fn_column='Observed Fpts',return_score = True,stack=five_three,no_opps=True)
         return lineup,score
     
-    def standard_sims(self, df, count, fpts_col_name='Fpts', ceil_column=None, floor_column=None,ownership_column = None,status_bar=None):
+    def standard_sims(self, df, count, fpts_col_name='Fpts', ceil_column=None, floor_column=None,ownership_column = None,status_bar=None,five_three = False):
         '''
         returns a datarame of optimal rates as well as an array of simulated winning lineups
         
@@ -36,7 +36,7 @@ class sims():
         df = df.drop_duplicates(subset = ['Name','Team',fpts_col_name])
         df = self.optimizer.prep_df()
           
-        inputs = [(df, fpts_col_name,ceil_column,floor_column,'Observed Fpts')] * count
+        inputs = [(df, fpts_col_name,ceil_column,floor_column,'Observed Fpts',five_three)] * count
         with concurrent.futures.ThreadPoolExecutor(max_workers = 3) as e:
             lineup_list = list(e.map(self.scramble_and_optimize,inputs))
             
