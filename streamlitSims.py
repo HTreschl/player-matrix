@@ -36,7 +36,7 @@ class sims():
         df = df.drop_duplicates(subset = ['Name','Team',fpts_col_name])
         df = self.optimizer.prep_df()
           
-        inputs = [(df, fpts_col_name,ceil_column,floor_column,'Observed Fpts')] * count
+        inputs = [(df, fpts_col_name,ceil_column,floor_column,'Observed Fpts',five_three)] * count
         with concurrent.futures.ThreadPoolExecutor(max_workers = 3) as e:
             lineup_list = list(e.map(self.scramble_and_optimize,inputs))
             
