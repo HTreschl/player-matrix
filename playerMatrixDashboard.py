@@ -95,7 +95,8 @@ if st.session_state['sport'] == 'MLB':
         #sims tab
         with sims_tab:
             st.subheader('Sims Settings')    
-            count = int(st.number_input('How many sims to run?'))    
+            count = int(st.number_input('How many sims to run?'))
+            five_three = st.checkbox('Use 5/3 Stacks?', value = False)
             sims_button = st.button('Run Sims')
             
         if sims_button: #run the sims
@@ -105,7 +106,7 @@ if st.session_state['sport'] == 'MLB':
             else:
                 ownership_col = None
                 
-            sims_results,lineups = sport_class.standard_sims(st.session_state['input data'], count, fpts_col_name='Fpts', ceil_column = 'Ceil', floor_column = 'Floor',ownership_column=ownership_col, status_bar=status_bar)
+            sims_results,lineups = sport_class.standard_sims(st.session_state['input data'], count, fpts_col_name='Fpts', ceil_column = 'Ceil', floor_column = 'Floor',ownership_column=ownership_col, status_bar=status_bar,five_three=five_three)
             status_bar.empty()
             st.session_state['sim results'] = sims_results
             st.session_state['lineups'] = lineups
