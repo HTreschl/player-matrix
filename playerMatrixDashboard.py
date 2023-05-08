@@ -96,7 +96,7 @@ if st.session_state['sport'] == 'MLB':
         with sims_tab:
             st.subheader('Sims Settings')    
             count = int(st.number_input('How many sims to run?'))
-            five_three = st.checkbox('Use 5/3 Stacks?', value = False)
+            stack = st.selectbox('Stacks to use?', value = None, options = [(5,3),(4,4),(4,3),(5,2),(3,3)])
             sims_button = st.button('Run Sims')
             
         if sims_button: #run the sims
@@ -105,8 +105,14 @@ if st.session_state['sport'] == 'MLB':
                 ownership_col = 'Ownership'
             else:
                 ownership_col = None
-                
-            sims_results,lineups = sport_class.standard_sims(st.session_state['input data'], count, fpts_col_name='Fpts', ceil_column = 'Ceil', floor_column = 'Floor',ownership_column=ownership_col, status_bar=status_bar,five_three=five_three)
+            sims_results,lineups = sport_class.standard_sims(st.session_state['input data'],
+                                                             count,
+                                                             fpts_col_name='Fpts',
+                                                             ceil_column = 'Ceil', 
+                                                             floor_column = 'Floor',
+                                                             ownership_column=ownership_col, 
+                                                             status_bar=status_bar,
+                                                             stack=stack)
             status_bar.empty()
             st.session_state['sim results'] = sims_results
             st.session_state['lineups'] = lineups
@@ -298,6 +304,3 @@ if st.session_state['sport'] == 'NFL':
                      available for download for example formatting (WIP). Once you've uploaded projections, you can run sims and get the mathematically optimal play rate for each player. 
                      Once you've run the sims, dive into the data in the "explore Relationships" section.
                      ''')
-                     
-        
-    
