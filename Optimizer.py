@@ -60,7 +60,7 @@ class MLB():
         
         
         #pitchers and hitters
-        df['hitters'] = np.where(df['Position']!='P', 1, 0)
+        df['hitters'] = np.where(df['Position']!='SP', 1, 0)
         df['pitchers'] = np.where(df['Position']=='SP', 1, 0)
         return df
     
@@ -281,5 +281,4 @@ class NFL():
         
         prob.solve(self.solver)
         slns = [x.name[8:].replace('_',' ') for x in prob.variables() if x.varValue == 1]
-        return slns  
-    
+        return slns
