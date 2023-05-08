@@ -96,7 +96,7 @@ if st.session_state['sport'] == 'MLB':
         with sims_tab:
             st.subheader('Sims Settings')    
             count = int(st.number_input('How many sims to run?'))
-            stack = st.selectbox('Stacks to use?', value = None, options = [(5,3),(4,4),(4,3),(5,2),(3,3)])
+            stack = st.selectbox('Stacks to use?', index=5, options = [(5,3),(4,4),(4,3),(5,2),(3,3),None])
             sims_button = st.button('Run Sims')
             
         if sims_button: #run the sims
@@ -304,3 +304,6 @@ if st.session_state['sport'] == 'NFL':
                      available for download for example formatting (WIP). Once you've uploaded projections, you can run sims and get the mathematically optimal play rate for each player. 
                      Once you've run the sims, dive into the data in the "explore Relationships" section.
                      ''')
+                     
+        
+    
