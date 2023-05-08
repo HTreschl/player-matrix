@@ -59,7 +59,7 @@ class sims():
         #get lineup total scores
         expected_scores = [self.get_total_lineup_score(lineup, fpts_col_name) for lineup in lineup_list]
         #take the weighted average of the actual score and the expected score
-        scores = [((expected_scores[i]*5)+(observed_scores[i]))/6 for i in range(count)]
+        scores = [((expected_scores[i]*10)+(observed_scores[i]))/11 for i in range(count)]
         lineups = list(zip(lineup_list,scores))
         
         return df, lineups
