@@ -19,7 +19,7 @@ class sims():
     def scramble_projections(df, fpts_column,ceil_column=None, floor_column=None):
         return
         
-    def standard_sims(self, df, count, fpts_col_name='Fpts', ceil_column=None, floor_column=None,ownership_column = None,status_bar=None,five_three = False):
+    def standard_sims(self, df, count, fpts_col_name='Fpts', ceil_column=None, floor_column=None,ownership_column = None,status_bar=None,stack = None):
         '''
         returns a datarame of optimal rates as well as an array of simulated winning lineups
         
@@ -29,7 +29,7 @@ class sims():
         df = df.drop_duplicates(subset = ['Name','Team',fpts_col_name])
         df = self.optimizer.prep_df()
           
-        inputs = [(df, fpts_col_name,ceil_column,floor_column,'Observed Fpts',five_three)] * count
+        inputs = [(df, fpts_col_name,ceil_column,floor_column,'Observed Fpts',stack)] * count
         with concurrent.futures.ThreadPoolExecutor(max_workers = 3) as e:
             lineup_list = list(e.map(self.scramble_and_optimize,inputs))
             
