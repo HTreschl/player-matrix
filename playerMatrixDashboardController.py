@@ -8,9 +8,10 @@ import pandas as pd
 import streamlit as st
 import Optimizer as opt
 
-def lineup_parser(lineups, crit):
+def lineup_parser(lineups:list, crit:set):
     '''parses a list of lineups based on passed criteria'''
-    rel_lineups = [x for x in lineups if crit.issubset(set(x))]
+    lineups = [x[0] for x in lineups]
+    rel_lineups = [x for x in lineups if crit.issubset(x)]
     flat_lineups = [x for y in rel_lineups for x in y]
     counts = pd.DataFrame(flat_lineups, columns=['Name']).groupby('Name')['Name'].count()
     counts = pd.DataFrame(counts).rename(columns = {'Name':'Count'}).reset_index().sort_values(by = 'Count', ascending=False)
