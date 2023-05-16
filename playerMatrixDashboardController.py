@@ -16,9 +16,9 @@ def lineup_parser(lineups: list, crit: set):
     df['Position'] = [x[1] for x in df['Player']]
     df['Team'] = [x[2] for x in df['Player']]
     df = df.drop(columns = ['Player','Lineup Score'])
+    df['group'] = df.groupby(df.index)['Name'].apply(list)
     
-    rel_index = list(df[df['Name'].isin(crit)].index)
-    flat_lineups = df[df.index.isin(rel_index)]
+    flat_lineups = df[df['group'].apply(lambda x: crit.issubset(x))]
     counts = flat_lineups.groupby('Name')['Name'].count()
     counts = pd.DataFrame(counts).rename(columns = {'Name':'Count'}).reset_index().sort_values(by = 'Count', ascending=False)
     return counts
