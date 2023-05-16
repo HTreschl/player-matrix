@@ -10,7 +10,7 @@ import Optimizer as opt
 
 def lineup_parser(lineups, crit):
     '''parses a list of lineups based on passed criteria'''
-    rel_lineups = [x for x in lineups if crit.issubset(x)]
+    rel_lineups = [x for x in lineups if crit.issubset(set(x))]
     flat_lineups = [x for y in rel_lineups for x in y]
     counts = pd.DataFrame(flat_lineups, columns=['Name']).groupby('Name')['Name'].count()
     counts = pd.DataFrame(counts).rename(columns = {'Name':'Count'}).reset_index().sort_values(by = 'Count', ascending=False)
@@ -90,3 +90,4 @@ def parse_lineups(lineups_list):
     df['Max Size'] = [max(x.values()) for x in df['Stacks']]
     df['Summary'] = [list(x.values()) for x in df['Stacks']]
     return df
+
