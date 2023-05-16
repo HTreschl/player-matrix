@@ -8,13 +8,18 @@ import pandas as pd
 import streamlit as st
 import Optimizer as opt
 
-def lineup_parser(lineups:list, crit:set):
-    '''parses a list of lineups based on passed criteria'''
-    lineups = [x[0] for x in lineups]
-    print(lineups)
-    rel_lineups = [x for x in lineups if crit.issubset(x)]
-    flat_lineups = [x for y in rel_lineups for x in y]
-    counts = pd.DataFrame(flat_lineups, columns=['Name']).groupby('Name')['Name'].count()
+def lineup_parser(lineups: list, crit: set):
+    '''parses a list of lineups based on passed criteria to get the lineups including those players'''
+    df = pd.DataFrame(lineups, columns = ['Player','Lineup Score'])
+    df = df.explode('Player')
+    df['Name'] = [x[0] for x in df['Player']]
+    df['Position'] = [x[1] for x in df['Player']]
+    df['Team'] = [x[2] for x in df['Player']]
+    df = df.drop(columns = ['Player','Lineup Score'])
+    
+    rel_index = set(df[df['Name'].isin(crit)].index)
+    flat_lineups = df.filter(items = rel_index)
+    counts = flat_lineups.groupby('Name')['Name'].count()
     counts = pd.DataFrame(counts).rename(columns = {'Name':'Count'}).reset_index().sort_values(by = 'Count', ascending=False)
     return counts
 
