@@ -159,7 +159,10 @@ if st.session_state['sport'] == 'MLB':
             with col_2:
                 stacks_to_include = st.multiselect('Stacks to Include', lineups['Summary'].drop_duplicates())
             filtered_lineups = lineups[lineups['Summary'].isin(stacks_to_include)].sort_values(by = ['Lineup Score'], ascending=False).head(count*10)
+            lineup_counts = controller.get_lineup_counts(st.session_state['lineups'])
             st.dataframe(filtered_lineups)
+            st.write('Lineups Counts')
+            st.dataframe(lineup_counts)
             st.download_button('Export lineups to DK', filtered_lineups.to_csv(encoding = 'utf-8'), file_name='DK Lineups.csv')
                 
     else: #no valid data
