@@ -98,3 +98,11 @@ def parse_lineups(lineups_list):
     df['Summary'] = [list(x.values()) for x in df['Stacks']]
     return df
 
+@st.cache
+def get_lineup_counts(lineups_list):
+    '''given a list of lineups from mlb sims, returns a dataframe of the lineup and the number of times it occurred'''
+    df = pd.DataFrame(lineups_list, columns = ['Player','Lineup Score'])
+    d = df.groupby('Player').count().reset_index()
+    return d
+    
+
