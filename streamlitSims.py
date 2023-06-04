@@ -103,7 +103,7 @@ class mlb(sims):
        
        #get team hitter results, use as base for hitters
        teams = list(set(df['Team']))
-       team_result = [np.random.normal(1,.40) for t in teams]
+       team_result = [np.random.normal(1,.25) for t in teams]
        t_df = pd.DataFrame({'Team':teams, 'team_result':team_result})
        df = df.merge(t_df, how = 'left', on = 'Team')
        
@@ -116,16 +116,16 @@ class mlb(sims):
                opp_team_result = 0
            p_sl = df[(df['Team']==t)&(df['Position'] == 'SP')]
            h_sl = df[(df['Team']==t)&(df['Position'] != 'SP')]
-           p_sl['pitcher_result'] = 1-(.33*opp_team_result)
-           p_sl['results'] = [np.random.normal(pr, .50) for pr in p_sl['pitcher_result']]
-           h_sl['results'] = [np.random.normal(hr, .50) for hr in h_sl['team_result']]
+           p_sl['pitcher_result'] = 1-(.18*opp_team_result)
+           p_sl['results'] = [np.random.normal(pr, .30) for pr in p_sl['pitcher_result']]
+           h_sl['results'] = [np.random.normal(hr, .30) for hr in h_sl['team_result']]
            slices.append(p_sl)
            slices.append(h_sl)
            
        tmp = pd.concat(slices)
        
        #fill the empties with simple random values
-       tmp['results'] = [np.random.normal(1,1) if np.isnan(x) else x for x in tmp['results']]
+       tmp['results'] = [np.random.normal(1,.55) if np.isnan(x) else x for x in tmp['results']]
        res = list(tmp['results'])
        
        #generate fpts values
