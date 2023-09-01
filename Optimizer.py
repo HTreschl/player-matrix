@@ -311,8 +311,6 @@ class NFL():
         
     def prep_df(self):
         #3placeholder method to match MLB
-        if 'Pos' in self.df.columns:
-            self.df = self.df.rename(columns = {'Pos':'Position'})
         return self.df
         
         
