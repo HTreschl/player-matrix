@@ -172,7 +172,7 @@ class NFL():
         self.num_players = 9
         #self.solver = pulp.getSolver('CPLEX_CMD')
         
-    def standard_optimizer(self, df, objective_fn_column = 'avg fpts'):
+    def standard_optimizer(self, df, objective_fn_column = 'avg fpts', return_score = False):
         '''returns the top lineup from the given dataframe for the standard contest type
         Columns = Name, Salary, Pos, Team, avg fpts'''
 
@@ -205,7 +205,16 @@ class NFL():
         prob.setObjective(pulp.lpSum([df[objective_fn_column][f]*lineup[f] for f in df.index]))
         
         prob.solve()
-        slns = [x.name[8:].replace('_',' ') for x in prob.variables() if x.varValue == 1]
+        
+        #write to list of playernames
+        sln_locs = [' '.join(x.name.split('_')[1:]) for x in prob.variables() if x.varValue == 1 and 'teams_' not in x.name]
+        df = df.reset_index()
+        slns = df[df['Name'].isin(sln_locs)]
+        if return_score:
+            score = slns[objective_fn_column].sum()
+            return slns[['Name','Pos','Team']].values.tolist(), score
+        else:
+            return slns[['Name','Pos','Team']].values.tolist()
         return slns
     
     def showdown_optimizer(self, df, objective_fn_column = 'avg fpts'):
