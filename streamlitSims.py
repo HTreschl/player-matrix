@@ -47,6 +47,8 @@ class sims():
         df = df.merge(counts, how='left', on=['Name','Position','Team'])
         #calculations
         df['Optimal Ownership'] = (df['count']/count)*100
+        if 'Efficiency' not in df.columns:
+            df['Efficiency'] = df[fpts_col_name]/df['Salary']
         include_columns = ['Name','Position','Team','Opp','Salary','Optimal Ownership','Efficiency', fpts_col_name]
         if ownership_column is not None:
             df['Leverage'] = df['Optimal Ownership'] - df[ownership_column] 
