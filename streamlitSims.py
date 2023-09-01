@@ -18,7 +18,7 @@ class sims():
     
     def scramble_projections(df, fpts_column,ceil_column=None, floor_column=None):
         return
-        
+    
     def standard_sims(self, df, count, fpts_col_name='Fpts', ceil_column=None, floor_column=None,ownership_column = None,status_bar=None,stack = None):
         '''
         returns a datarame of optimal rates as well as an array of simulated winning lineups
@@ -163,7 +163,8 @@ class nfl(sims):
     def scramble_and_optimize(self,args):
         df, fpts_col_name,ceil_column,floor_column,objective_fn_column,stack = args
         df['Observed Fpts'] = self.scramble_projections(df, fpts_col_name, ceil_column, floor_column)
-        lineup,score = opt.MLB(df).standard_optimizer(df, objective_fn_column='Observed Fpts',return_score = True,stack=stack)
+        lineup = self.optimizer.standard_optimizer(df, objective_fn_column='Observed Fpts')
+        score = None
         return lineup,score
     
     def scramble_projections(self, df, fpts_column, ceil_column=None, floor_column=None):
