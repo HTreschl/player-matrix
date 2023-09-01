@@ -36,7 +36,6 @@ class sims():
         observed_scores = [x[1] for x in lineup_list]
         lineup_list = [x[0] for x in lineup_list]
         print(lineup_list)
-        
         player_list = []
         for lineup in lineup_list:
             for player in lineup:
@@ -164,8 +163,7 @@ class nfl(sims):
     def scramble_and_optimize(self,args):
         df, fpts_col_name,ceil_column,floor_column,objective_fn_column,stack = args
         df['Observed Fpts'] = self.scramble_projections(df, fpts_col_name, ceil_column, floor_column)
-        lineup = self.optimizer.standard_optimizer(df, objective_fn_column='Observed Fpts')
-        score = None
+        lineup,score = self.optimizer.standard_optimizer(df, objective_fn_column='Observed Fpts', return_score = True)
         return lineup,score
     
     def scramble_projections(self, df, fpts_column, ceil_column=None, floor_column=None):
