@@ -108,7 +108,25 @@ class MLB():
         #salary constraint
         prob += pulp.lpSum([df['Salary'][i] * lineup[i] for i in df.index]) <= 50000
 
+        '''
         #five three stack       
+        if stack:
+            #determine which teams are stacked 
+            teams = set(df['Team'])            
+            stack_primary = pulp.LpVariable.dicts('teams_primary',teams, cat='Binary')
+            stack_secondary = pulp.LpVariable.dicts('teams_secondary',teams, cat='Binary')
+            prob += pulp.lpSum([stack_primary[i] for i in teams]) == 1
+            prob += pulp.lpSum([stack_secondary[i] for i in teams]) == 2
+            #stack_params = [pulp.LpVariable('stack_{}_{}'.format(x[0],x[1]),cat='Binary') for x in stack]
+            #prob += pulp.lpSum([stack_params[i] for i in range(len(stack))]) == 1
+            for s_it,s in enumerate(stack):
+                for t in teams:
+                    sl = df[(df['t_'+t]==1) & (df['hitters']==1)] 
+                    #set stack size
+                    prob += (s[0]*stack_primary[t]<= pulp.lpSum([sl['hitters'][i]*lineup[i] for i in sl.index]))
+                    prob += (s[1]*stack_secondary[t]<= pulp.lpSum([sl['hitters'][i]*lineup[i] for i in sl.index]))
+          
+        '''    
         if stack:
             teams = set(df['Team'])            
             stack_5 = pulp.LpVariable.dicts('teams_5',teams, cat='Binary')
@@ -121,7 +139,6 @@ class MLB():
                 sl = df[(df['t_'+t]==1) & (df['hitters']==1)] 
                 prob += (stack_1_size*stack_5[t] <= pulp.lpSum([sl['hitters'][i]*lineup[i] for i in sl.index]))
                 prob += (stack_2_size*stack_3[t] <= pulp.lpSum([sl['hitters'][i]*lineup[i] for i in sl.index]))
-          
             
         #no opps
         if no_opps:
@@ -282,3 +299,34 @@ class NFL():
         prob.solve(self.solver)
         slns = [x.name[8:].replace('_',' ') for x in prob.variables() if x.varValue == 1]
         return slns
+        
+    def prep_df(self):
+        #3placeholder method to match MLB
+        return self.df
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+    
