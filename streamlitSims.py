@@ -186,7 +186,7 @@ class nfl(sims):
         slice_list = [] #placeholder for df slices
         
         #get QB results
-        qbs = df[df['Pos']=='QB']
+        qbs = df[df['Position']=='QB']
         qbs['results'] = [np.random.normal(1,1) for i in range(len(qbs))]
         slice_list.append(qbs)
         
@@ -196,7 +196,7 @@ class nfl(sims):
             opponent_qb_result = qbs.loc[qbs['Opp']==team, 'results'].reset_index().at[0, 'results']
             net_qb_result = team_qb_result + (opponent_qb_result*self.correlation_values['QB']['Opp_QB'])
             for pos in qb_correlated_positions:
-                pos_sl = df[(df['Pos'] == pos) & (df['Team'] == team)]
+                pos_sl = df[(df['Position'] == pos) & (df['Team'] == team)]
                 pos_sl['results'] = [np.random.normal(net_qb_result*self.correlation_values['QB'][pos],1) for i in range(len(pos_sl))]
                 slice_list.append(pos_sl)
         correlated_results = pd.concat(slice_list)[['results']]
