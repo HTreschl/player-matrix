@@ -179,7 +179,6 @@ if st.session_state['sport'] == 'NFL':
     intro_tab, data_tab, sims_tab, relationships_tab, correlations_tab = st.tabs(['What is this?','Import Projections','Run Sims', 'Explore Relationships', 'Edit Correlations'])
     
     #start appropriate class
-    sport_class = sims.nfl()
     st.session_state['correlation dict'] = {'QB':{'WR':.66,'TE':.33,'RB':.08, 'Opp_QB':.24}}
     
     #write documentation
@@ -204,7 +203,8 @@ if st.session_state['sport'] == 'NFL':
     
     if dat is not None:
         df = pd.read_csv(dat)
-        st.session_state['input data'] = df   
+        st.session_state['input data'] = df  
+        sport_class = sims.nfl(st.session_state['input_data'])
         has_valid_data = controller.data_checker(st.session_state['input data'], st.session_state['sport'])
         team_options = set(df['Team'])
         
