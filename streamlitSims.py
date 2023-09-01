@@ -158,6 +158,7 @@ class nfl(sims):
             self.correlation_values = {'QB':{'WR':.66, 'TE':.33, 'Opp_QB':0.0}}
         else:
             self.correlation_values = correlation_values
+        df = df.rename(columns = {'Pos':'Position'})
         self.optimizer = opt.NFL(df)
         self.df = df
         return
