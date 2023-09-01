@@ -178,7 +178,7 @@ class NFL():
 
         
         #initial cleanup; get dummy variables for positions and drop nulls in target column
-        pos_dummies = pd.get_dummies(df['Pos'])
+        pos_dummies = pd.get_dummies(df['Position'])
         df = df.merge(pos_dummies,how='inner', left_index=True, right_index = True).set_index('Name')
         df = df[df[objective_fn_column].isnull() == False]
         
@@ -212,9 +212,9 @@ class NFL():
         slns = df[df['Name'].isin(sln_locs)]
         if return_score:
             score = slns[objective_fn_column].sum()
-            return slns[['Name','Pos','Team']].values.tolist(), score
+            return slns[['Name','Position','Team']].values.tolist(), score
         else:
-            return slns[['Name','Pos','Team']].values.tolist()
+            return slns[['Name','Position','Team']].values.tolist()
         return slns
     
     def showdown_optimizer(self, df, objective_fn_column = 'avg fpts'):
@@ -273,7 +273,7 @@ class NFL():
 
         
         #initial cleanup; get dummy variables for positions and drop nulls in target column
-        pos_dummies = pd.get_dummies(df['Pos'])
+        pos_dummies = pd.get_dummies(df['Position'])
         df = df.merge(pos_dummies,how='inner', left_index=True, right_index = True)
         player_dummies = pd.get_dummies(df['Name'])
         df = df.merge(player_dummies, how = 'inner', left_index = True, right_index = True)
