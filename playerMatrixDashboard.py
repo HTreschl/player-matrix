@@ -204,12 +204,12 @@ if st.session_state['sport'] == 'NFL':
     if dat is not None:
         df = pd.read_csv(dat)
         st.session_state['input data'] = df  
-        sport_class = sims.nfl(st.session_state['input_data'])
         has_valid_data = controller.data_checker(st.session_state['input data'], st.session_state['sport'])
         team_options = set(df['Team'])
         
     #if valid data exists
     if has_valid_data:
+        sport_class = sims.nfl(st.session_state['input_data'])
         with data_tab:
             st.subheader('Imported Data')
             #st.session_state['included_teams'] = st.multiselect('Teams To Include',team_options, default = st.session_state['included_teams']) 
