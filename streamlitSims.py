@@ -35,6 +35,7 @@ class sims():
             
         observed_scores = [x[1] for x in lineup_list]
         lineup_list = [x[0] for x in lineup_list]
+        print(lineup_list)
         
         player_list = []
         for lineup in lineup_list:
