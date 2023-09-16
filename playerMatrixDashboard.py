@@ -209,7 +209,7 @@ if st.session_state['sport'] == 'NFL':
         
     #if valid data exists
     if has_valid_data:
-        sport_class = sims.nfl(st.session_state['input data'])
+        sport_class = sims.nfl(st.session_state['input data'], correlation_values = st.session_state['correlation dict'])
         with data_tab:
             st.subheader('Imported Data')
             #st.session_state['included_teams'] = st.multiselect('Teams To Include',team_options, default = st.session_state['included_teams']) 
