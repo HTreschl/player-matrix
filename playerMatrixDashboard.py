@@ -314,5 +314,3 @@ if st.session_state['sport'] == 'NFL':
                      Once you've run the sims, dive into the data in the "explore Relationships" section.
                      ''')
                      
-        
-    
