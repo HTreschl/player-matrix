@@ -7,6 +7,54 @@ Created on Mon Jan  9 15:54:51 2023
 import pandas as pd
 import streamlit as st
 import Optimizer as opt
+import networkx as nx
+import plotly.express as px
+
+
+def createNodeChart3D(data, min_weight=5, scale=2.0, player_filter=[]):
+    # Filter data based on player_filter
+    data = [d for d in data if set(player_filter).issubset(set(d))]
+
+    # Create an empty graph
+    G = nx.Graph()
+
+    # Create a dictionary to store edge weights
+    edge_weights = {}
+
+    # Iterate through the data and add edges based on shared elements
+    for sublist in data:
+        for i, node1 in enumerate(sublist):
+            for j, node2 in enumerate(sublist):
+                if i < j:
+                    edge = (node1, node2)
+                    if edge in edge_weights:
+                        edge_weights[edge] += 1
+                    else:
+                        edge_weights[edge] = 1
+
+    # Add edges to the graph with their corresponding weights, but only if weight >= min_weight
+    for edge, weight in edge_weights.items():
+        if weight >= min_weight:
+            G.add_edge(edge[0], edge[1], weight=weight)
+
+    # Extract node positions from the graph
+    pos = nx.kamada_kawai_layout(G, scale=scale, dim=3)
+
+    # Create a DataFrame from the node positions
+    nodes_df = pd.DataFrame(pos).T
+    nodes_df.columns = ['X', 'Y', 'Z']
+
+    # Create an interactive 3D scatter plot using Plotly
+    fig = px.scatter_3d(nodes_df, x='X', y='Y', z='Z', text=nodes_df.index)
+
+    # Customize the appearance and interactivity if needed
+    fig.update_traces(marker=dict(size=10))
+
+    # Show the interactive plot
+    fig.show()
+
+    return G, fig
+
 
 def lineup_parser(lineups: list, crit: set):
     '''parses a list of lineups based on passed criteria to get the lineups including those players'''
